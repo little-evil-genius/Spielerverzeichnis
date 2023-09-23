@@ -31,6 +31,7 @@ Dieses Plugin erstellt eine Übersicht von allen Usern mit ihren Charakteren. Zu
 <br>
 <b>playerdirectory_playerstat<br></b>
 {$mainID} - User-ID vom Haupt-Charakter<br>
+{$playerstat['XXX']} - Ausgabe von Profilfelder/Steckbrieffelder/Spalten der Users DB Tabelle von Daten vom <b>HAUPT</b>-Account<br>
 <b>erster Charakter</b><br>
 {$firstchara} - nur der Charaktername ohne Reistrierungsdatum (als Link, ohne Formatierung)<br>
 {$firstchara_formated} - nur der Charaktername ohne Reistrierungsdatum (als Link, mit Formatierung)<br>
@@ -45,7 +46,6 @@ Dieses Plugin erstellt eine Übersicht von allen Usern mit ihren Charakteren. Zu
 <b>heißester Charakter</b><br>
 {$hotCharacter} - nur der Charaktername und Postanzahl (als Link, ohne Formatierung)<br>
 {$hotCharacter_formated} - nur der Charaktername und Postanzahl (als Link, mit Formatierung)<br>
-{$playerstat['XXX']} - Ausgabe von Profilfelder/Steckbrieffelder/Spalten der Users DB Tabelle von Daten vom <b>HAUPT</b>-Account<br>
 <br>
 <br>
 <b>playerdirectory_characterstat<br></b>
