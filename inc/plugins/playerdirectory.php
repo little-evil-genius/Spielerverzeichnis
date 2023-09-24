@@ -77,7 +77,7 @@ function playerdirectory_install(){
         `name` VARCHAR(500) COLLATE utf8_general_ci NULL,
         `identification` VARCHAR(500) COLLATE utf8_general_ci NULL,
         `type` int(1) unsigned NOT NULL,
-        `type` int(1) unsigned NOT NULL DEFAULT '0',
+        `legend` int(1) unsigned NOT NULL DEFAULT '0',
         `field` VARCHAR(500) COLLATE utf8_general_ci NULL,
         `ignor_option` VARCHAR(500) COLLATE utf8_general_ci NULL,
         `usergroups` VARCHAR(500) COLLATE utf8_general_ci NULL,
@@ -118,15 +118,15 @@ function playerdirectory_install(){
 			'disporder' => 2
 		),
 		'playerdirectory_directory_multipage' => array(
-			'title' => $lang->playerdirectory_setting_multipage,
-			'description' => $lang->playerdirectory_setting_multipage_desc,
+			'title' => $lang->playerdirectory_setting_directory_multipage,
+			'description' => $lang->playerdirectory_setting_directory_multipage_desc,
 			'optionscode' => 'numeric',
 			'value' => '20', // Default
 			'disporder' => 3
 		),
 		'playerdirectory_directory_teamaccounts' => array(
-			'title' => $lang->playerdirectory_setting_teamaccounts,
-			'description' => $lang->playerdirectory_setting_teamaccounts_desc,
+			'title' => $lang->playerdirectory_setting_directory_teamaccounts,
+			'description' => $lang->playerdirectory_setting_directory_teamaccounts_desc,
 			'optionscode' => 'text',
 			'value' => '1', // Default
 			'disporder' => 4
@@ -162,7 +162,7 @@ function playerdirectory_install(){
 		'playerdirectory_profilfeldsystem' => array(
 			'title' => $lang->playerdirectory_setting_profilfeldsystem,
 			'description' => $lang->playerdirectory_setting_profilfeldsystem_desc,
-			'optionscode' => 'select\n0='.$lang->playerdirectory_setting_profilfeldsystem_profilefield.'\n1='.$lang->playerdirectory_setting_profilfeldsystem_applicationfiel.'\n2='.$lang->playerdirectory_setting_profilfeldsystem_both,
+			'optionscode' => 'select\n0='.$lang->playerdirectory_setting_profilfeldsystem_profilefield.'\n1='.$lang->playerdirectory_setting_profilfeldsystem_applicationfield.'\n2='.$lang->playerdirectory_setting_profilfeldsystem_both,
 			'value' => '0', // Default
 			'disporder' => 9
 		),
@@ -2092,7 +2092,7 @@ function playerdirectory_admin_manage() {
 
             } else {
                 $setting_gid = $db->fetch_field($db->simple_select("settinggroups", "gid", "name = 'playerdirectory'"), "gid");
-                $form_container->output_cell($lang->sprintf($lang->playerdirectory_manage_overview_stat_color, $setting_gid), array("colspan" => 2));
+                $form_container->output_cell($lang->sprintf($lang->playerdirectory_manage_playerstat_deactivated, $setting_gid), array("colspan" => 2));
                 $form_container->construct_row();
             } 
 
@@ -2405,15 +2405,14 @@ function playerdirectory_admin_manage() {
             // letztes Komma vom String entfernen
             $usedgroups = substr($usedgroups, 0, -1);
             if ($db->num_rows($query_usedgroups) > 0) {
-                $usergroup_sql = "WHERE gid NOT IN (".$usedgroups.")";
+                $usergroup_sql = "WHERE gid NOT IN (".$usedgroups.") AND gid != '1'";
             } else {
-                $usergroup_sql = "";
+                $usergroup_sql = "WHERE gid != '1'";
             }
             
             // Benutzergruppen auslesen
             $query_usergroups = $db->query("SELECT * FROM ".TABLE_PREFIX."usergroups
-            $usergroup_sql
-            AND gid != '1'
+            ".$usergroup_sql."
             ORDER BY disporder ASC
             ");
         
