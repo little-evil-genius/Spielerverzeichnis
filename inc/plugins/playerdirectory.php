@@ -3952,10 +3952,14 @@ function playerdirectory_misc(){
         // NAVIGATION
 		if(!empty($listsnav)){
             add_breadcrumb($lang->playerdirectory_lists, $listsnav);
-            add_breadcrumb($lang->playerdirectory_directory, "misc.php?action=playerdirectory");
+            if ($directory_activated == 1) {
+                add_breadcrumb($lang->playerdirectory_directory, "misc.php?action=playerdirectory");
+            }
             add_breadcrumb($lang->sprintf($lang->playerdirectory_playerstat, $playername), "misc.php?action=playerstatistic&uid=".$playerID);
 		} else{
-            add_breadcrumb($lang->playerdirectory_directory, "misc.php?action=playerdirectory");
+            if ($directory_activated == 1) {
+                add_breadcrumb($lang->playerdirectory_directory, "misc.php?action=playerdirectory");
+            }
             add_breadcrumb($lang->sprintf($lang->playerdirectory_playerstat, $playername), "misc.php?action=playerstatistic&uid=".$playerID);
 		}
         
@@ -5322,13 +5326,17 @@ function playerdirectory_misc(){
         // NAVIGATION
 		if(!empty($listsnav)){
             add_breadcrumb($lang->playerdirectory_lists, $listsnav);
-            add_breadcrumb($lang->playerdirectory_directory, "misc.php?action=playerdirectory");
+            if ($directory_activated == 1) {
+                add_breadcrumb($lang->playerdirectory_directory, "misc.php?action=playerdirectory");
+            }
             if ($playerstat_activated == 1) {
                 add_breadcrumb($lang->sprintf($lang->playerdirectory_playerstat, $playername), "misc.php?action=playerstatistic&uid=".$playerID);
             }
             add_breadcrumb($lang->sprintf($lang->playerdirectory_characterstat, $charactername), "misc.php?action=characterstatistic");
 		} else{
-            add_breadcrumb($lang->playerdirectory_directory, "misc.php?action=playerdirectory");
+            if ($directory_activated == 1) {
+                add_breadcrumb($lang->playerdirectory_directory, "misc.php?action=playerdirectory");
+            }
             if ($playerstat_activated == 1) {
                 add_breadcrumb($lang->sprintf($lang->playerdirectory_playerstat, $playername), "misc.php?action=playerstatistic&uid=".$playerID);
             }
