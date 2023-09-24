@@ -4261,10 +4261,10 @@ function playerdirectory_misc(){
                 if ($mybb->user['uid'] == 0 AND $characterstat_activated_guest != 1) {
                     $character_button = "";
                 } else {
-                    $character_button = $lang->sprintf($lang->playerdirectory_directory_character_statbutton, $characterID);
+                    $character_button = $lang->sprintf($lang->playerdirectory_directory_character_statbutton, $charaID);
                 }
                 if ($mybb->user['uid'] != 0) {
-                    $character_button = $lang->sprintf($lang->playerdirectory_directory_character_statbutton, $characterID);
+                    $character_button = $lang->sprintf($lang->playerdirectory_directory_character_statbutton, $charaID);
                 }
             } else {
                 $character_button = "";
