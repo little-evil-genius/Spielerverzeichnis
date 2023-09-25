@@ -3697,7 +3697,10 @@ function playerdirectory_misc(){
                     // klassisches Profilfeld
                     if (is_numeric($age_field)) {
                         if(!empty($character[$age_fid])) {
-                            $age = $character[$age_fid];
+                            // Feld = X Jahre => Jahre rauswerfen
+                            $only_age = $character[$age_fid];
+                            $only_age = preg_replace('/[^0-9]/', '', $only_age);
+                            $age = $only_age;
                         } else {
                             $age = "00";
                         }
@@ -3705,7 +3708,10 @@ function playerdirectory_misc(){
                     // Steckbrief Plugin
                     else {
                         if(!empty($character[$age_field])) {
-                            $age = $character[$age_field];
+                            // Feld = X Jahre => Jahre rauswerfen
+                            $only_age = $character[$age_fid];
+                            $only_age = preg_replace('/[^0-9]/', '', $only_age);
+                            $age = $only_age;
                         } else {
                             $age = "00";
                         }
@@ -4129,7 +4135,10 @@ function playerdirectory_misc(){
                 // klassisches Profilfeld
                 if (is_numeric($age_field)) {
                     if(!empty($char[$age_fid])) {
-                        $age = $char[$age_fid];
+                        // Feld = X Jahre => Jahre rauswerfen
+                        $only_age = $char[$age_field];
+                        $only_age = preg_replace('/[^0-9]/', '', $only_age);
+                        $age = $only_age;
                     } else {
                         $age = "00";
                     }
@@ -4137,7 +4146,10 @@ function playerdirectory_misc(){
                 // Steckbrief Plugin
                 else {
                     if(!empty($char[$age_field])) {
-                        $age = $char[$age_field];
+                        // Feld = X Jahre => Jahre rauswerfen
+                        $only_age = $char[$age_field];
+                        $only_age = preg_replace('/[^0-9]/', '', $only_age);
+                        $age = $only_age;
                     } else {
                         $age = "00";
                     }
@@ -4805,7 +4817,13 @@ function playerdirectory_misc(){
                 $bday_array = [];
                 while($bdays = $db->fetch_array($query_birthdays)) {
                     $username = get_user($bdays['ufid'])['username'];
-                    $bday_array[$username] = $bdays['fid'.$age_field];
+                    
+                    // Feld = X Jahre => Jahre rauswerfen
+                    $only_age = $bdays['fid'.$age_field];
+                    $only_age = preg_replace('/[^0-9]/', '', $only_age);
+                    $age = $only_age;
+
+                    $bday_array[$username] = $age;
                 } 
             } else {
                 $query_birthdays = $db->query("SELECT * FROM ".TABLE_PREFIX."application_ucp_userfields
@@ -4817,7 +4835,13 @@ function playerdirectory_misc(){
                 $bday_array = [];
                 while($bdays = $db->fetch_array($query_birthdays)) {
                     $username = get_user($bdays['uid'])['username'];
-                    $bday_array[$username] = $bdays[$age_field];
+                    
+                    // Feld = X Jahre => Jahre rauswerfen
+                    $only_age = $bdays[$age_field];
+                    $only_age = preg_replace('/[^0-9]/', '', $only_age);
+                    $age = $only_age;
+
+                    $bday_array[$username] = $age;
                 }  
             }
         }
@@ -5530,7 +5554,10 @@ function playerdirectory_misc(){
             // klassisches Profilfeld
             if (is_numeric($age_field)) {
                 if(!empty($characterstat[$age_fid])) {
-                    $age = $characterstat[$age_fid];
+                    // Feld = X Jahre => Jahre rauswerfen
+                    $only_age = $characterstat[$age_fid];
+                    $only_age = preg_replace('/[^0-9]/', '', $only_age);
+                    $age = $only_age;
                 } else {
                     $age = "00";
                 }
@@ -5538,7 +5565,10 @@ function playerdirectory_misc(){
             // Steckbrief Plugin
             else {
                 if(!empty($characterstat[$age_field])) {
-                    $age = $characterstat[$age_field];
+                    // Feld = X Jahre => Jahre rauswerfen
+                    $only_age = $characterstat[$age_field];
+                    $only_age = preg_replace('/[^0-9]/', '', $only_age);
+                    $age = $only_age;
                 } else {
                     $age = "00";
                 }
