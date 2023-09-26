@@ -11,13 +11,18 @@ Genauso kann auch das Listen-Menü angezeigt werden, wenn man das <a href="https
 - Für eine Ausgabe von einem zufälligen Inplayzitat wird das <a href="https://github.com/its-sparks-fly/Inplayzitate-2.0"> Inplayzitate 2.0</a> oder <a href="https://github.com/ItsSparksFly/mybb-inplayquotes">Inplayzitate 3.0</a> Plugin von sparks fly verwendet. Wenn man diese Option nicht möchte, muss keins der beiden Plugins installiert sein.
 
 # Datenbank-Änderungen
-hinzugefügte Tabelle:
-- PRÄFIX_playerdirectory_statistics<br>
-<br>hinzugefügte Spalten in der DB-Tabelle PRÄFIX_users:
+### hinzugefügte Tabelle:
+* PRÄFIX_playerdirectory_statistics
+
+### hinzugefügte Spalten in der DB-Tabelle PRÄFIX_users:
 * playerdirectory_playerstat
 * playerdirectory_playerstat_guest
 * playerdirectory_characterstat
-* playerdirectory_characterstat_guest``
+* playerdirectory_characterstat_guest
+
+# Neue Sprachdateien
+- deutsch_du/admin/playerdirectory.lang.php
+- deutsch_du/playerdirectory.lang.php
 
 # Einstellungen - Spielerverzeichnis und Statistiken
 - Spielerverzeichnis aktivieren
@@ -93,9 +98,7 @@ Alle Templates wurden größtenteils ohne Tabellen-Struktur gecodet. Das Layout 
 Es wird automatisch in jedes bestehende und neue Design hinzugefügt. Man sollte es einfach einmal abspeichern, bevor man dies im Board mit der Untersuchungsfunktion bearbeiten will, da es dann passieren kann, dass das CSS für dieses Plugin in einen anderen Stylesheet gerutscht ist, obwohl es im ACP richtig ist.
 
 # Links
-<b>Admin</b>
-- euerforum.de/admin/index.php?module=user-playerdirectory<br>
-<b>Forum</b>
+- euerforum.de/admin/index.php?module=user-playerdirectory
 - euerforum.de/misc.php?action=playerdirectory
 - euerforum.de/misc.php?action=playerstatistic&uid=X
 - euerforum.de/misc.php?action=characterstatistic&uid=X
