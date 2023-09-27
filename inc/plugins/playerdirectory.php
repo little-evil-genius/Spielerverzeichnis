@@ -6261,6 +6261,7 @@ function playerdirectory_build_statistics($userids_string){
                     $options = $db->fetch_field($db->simple_select("profilefields", "type", "fid = '".$field."'"), "type");
                     // in Array splitten
                     $expoptions = explode("\n", $options);
+                    $fieldtyp = $expoptions['0'];
                     // Typ löschen (select, multiselect)
                     unset($expoptions['0']);
 
@@ -6278,11 +6279,19 @@ function playerdirectory_build_statistics($userids_string){
                     $data_options = [];
                     foreach ($expoptions as $option) {
 
-                        // Zählen wie viel von den Charakteren diesen Wert angegeben haben
-                        $userdata_query = $db->query("SELECT * FROM ".TABLE_PREFIX."userfields
-                        WHERE ufid IN (".$userids_string.")
-                        AND fid".$field." = '".$option."'
-                        ");
+                        if ($fieldtyp != "multiselect" OR $fieldtyp != "checkbox") {
+                            // Zählen wie viel von den Charakteren diesen Wert angegeben haben
+                            $userdata_query = $db->query("SELECT * FROM ".TABLE_PREFIX."userfields
+                            WHERE ufid IN (".$userids_string.")
+                            AND fid".$field." = '".$option."'
+                            ");
+                        } else {
+                            // Zählen wie viel von den Charakteren diesen Wert angegeben haben
+                            $userdata_query = $db->query("SELECT * FROM ".TABLE_PREFIX."userfields
+                            WHERE ufid IN (".$userids_string.")
+                            AND (concat(',',fid".$field.",',') LIKE '%,".$option.",%')
+                            ");
+                        }
                         $count = $db->num_rows($userdata_query);
 
                         $data_options[$option] = $count;
@@ -6293,6 +6302,7 @@ function playerdirectory_build_statistics($userids_string){
                 else {
                     // Auswahlmöglichkeiten vom Feld
                     $options = $db->fetch_field($db->simple_select("application_ucp_fields", "options", "fieldname = '".$field."'"), "options");
+                    $fieldtyp = $db->fetch_field($db->simple_select("application_ucp_fields", "fieldtyp", "fieldname = '".$field."'"), "fieldtyp");
                     // in Array splitten
                     $expoptions = str_replace(", ", ",", $options);
                     $expoptions = explode (",", $expoptions);
@@ -6314,12 +6324,21 @@ function playerdirectory_build_statistics($userids_string){
 
                         $fieldid = $db->fetch_field($db->simple_select("application_ucp_fields", "id", "fieldname = '".$field."'"), "id");
 
-                        // Zählen wie viel von den Charakteren diesen Wert angegeben haben
-                        $userdata_query = $db->query("SELECT * FROM ".TABLE_PREFIX."application_ucp_userfields
-                        WHERE uid IN (".$userids_string.")
-                        AND fieldid = '".$fieldid."'
-                        AND value = '".$option."'
-                        ");
+                        if ($fieldtyp != "multiselect" OR $fieldtyp != "checkbox") {
+                            // Zählen wie viel von den Charakteren diesen Wert angegeben haben
+                            $userdata_query = $db->query("SELECT * FROM ".TABLE_PREFIX."application_ucp_userfields
+                            WHERE uid IN (".$userids_string.")
+                            AND fieldid = '".$fieldid."'
+                            AND value = '".$option."'
+                            ");
+                        } else {
+                            // Zählen wie viel von den Charakteren diesen Wert angegeben haben
+                            $userdata_query = $db->query("SELECT * FROM ".TABLE_PREFIX."application_ucp_userfields
+                            WHERE uid IN (".$userids_string.")
+                            AND fieldid = '".$fieldid."'
+                            AND (concat(',',value,',') LIKE '%,".$option.",%')
+                            ");
+                        }
                         $count = $db->num_rows($userdata_query);
 
                         $data_options[$option] = $count;
