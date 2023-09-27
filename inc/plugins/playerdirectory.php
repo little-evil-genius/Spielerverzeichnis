@@ -2405,15 +2405,14 @@ function playerdirectory_admin_manage() {
             // letztes Komma vom String entfernen
             $usedgroups = substr($usedgroups, 0, -1);
             if ($db->num_rows($query_usedgroups) > 0) {
-                $usergroup_sql = "WHERE gid NOT IN (".$usedgroups.")";
+                $usergroup_sql = "WHERE gid NOT IN (".$usedgroups.") AND gid != '1'";
             } else {
-                $usergroup_sql = "";
+                $usergroup_sql = "WHERE gid != '1'";
             }
             
             // Benutzergruppen auslesen
             $query_usergroups = $db->query("SELECT * FROM ".TABLE_PREFIX."usergroups
-            $usergroup_sql
-            AND gid != '1'
+            ".$usergroup_sql."
             ORDER BY disporder ASC
             ");
         
