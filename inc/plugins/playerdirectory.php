@@ -82,7 +82,7 @@ function playerdirectory_install(){
         `ignor_option` VARCHAR(500) COLLATE utf8_general_ci NULL,
         `usergroups` VARCHAR(500) COLLATE utf8_general_ci NULL,
         `group_option` VARCHAR(500) COLLATE utf8_general_ci NULL,
-        `color` VARCHAR(5000) COLLATE utf8_general_ci NOT NULL,
+        `colors` VARCHAR(5000) COLLATE utf8_general_ci NOT NULL,
         `custom_properties` int(1) unsigned NOT NULL DEFAULT '0',
         PRIMARY KEY(`psid`),
         KEY `psid` (`psid`)
@@ -2475,21 +2475,23 @@ function playerdirectory_admin_manage() {
                 );
             }
             // Steckbrieffeld
-            $count_applicationfield = $db->num_rows($query_applicationfield);
-            if ($count_applicationfield > 0) {
-                $form_container->output_row(
-                    $lang->playerdirectory_manage_add_applicationfield, 
-                    $lang->playerdirectory_manage_add_applicationfield_desc, 
-                    $form->generate_select_box('applicationfield', $applicationfield_list, $mybb->get_input('applicationfield'), array('id' => 'applicationfield', 'size' => 5)),
-                    'applicationfield', array(), array('id' => 'row_applicationfield')
-                );
-            } else {
-                $form_container->output_row(
-                    $lang->playerdirectory_manage_add_applicationfield,
-                    $lang->playerdirectory_manage_add_applicationfield_desc,
-                    $form->generate_select_box('applicationfield', $nonefields_list, $mybb->get_input('applicationfield'), array('id' => 'applicationfield')),
-                    'applicationfield', array(), array('id' => 'row_applicationfield')
-                );
+            if ($profilfeldsystem != 0) { 
+                $count_applicationfield = $db->num_rows($query_applicationfield);
+                if ($count_applicationfield > 0) {
+                    $form_container->output_row(
+                        $lang->playerdirectory_manage_add_applicationfield, 
+                        $lang->playerdirectory_manage_add_applicationfield_desc, 
+                        $form->generate_select_box('applicationfield', $applicationfield_list, $mybb->get_input('applicationfield'), array('id' => 'applicationfield', 'size' => 5)),
+                        'applicationfield', array(), array('id' => 'row_applicationfield')
+                    );
+                } else {
+                    $form_container->output_row(
+                        $lang->playerdirectory_manage_add_applicationfield,
+                        $lang->playerdirectory_manage_add_applicationfield_desc,
+                        $form->generate_select_box('applicationfield', $nonefields_list, $mybb->get_input('applicationfield'), array('id' => 'applicationfield')),
+                        'applicationfield', array(), array('id' => 'row_applicationfield')
+                    );
+                }
             }
             // Auszuschließende Optionen
             $form_container->output_row(
@@ -2963,12 +2965,15 @@ function playerdirectory_admin_manage() {
                 'profilefield', array(), array('id' => 'row_profilefield')
             );
             // Steckbrieffeld
-            $form_container->output_row(
-                $lang->playerdirectory_manage_add_applicationfield, 
-                $lang->playerdirectory_manage_add_applicationfield_desc, 
-                $form->generate_select_box('applicationfield', $applicationfield_list, $statistic['field'], array('id' => 'applicationfield', 'size' => 5)),
-                'applicationfield', array(), array('id' => 'row_applicationfield')
-            );
+            if ($profilfeldsystem != 0) {
+                $form_container->output_row(
+                    $lang->playerdirectory_manage_add_applicationfield, 
+                    $lang->playerdirectory_manage_add_applicationfield_desc, 
+                    $form->generate_select_box('applicationfield', $applicationfield_list, $statistic['field'], array('id' => 'applicationfield', 'size' => 5)),
+                    'applicationfield', array(), array('id' => 'row_applicationfield')
+                );
+            }
+            
             // Auszuschließende Optionen
             $form_container->output_row(
                 $lang->playerdirectory_manage_add_ignor,
