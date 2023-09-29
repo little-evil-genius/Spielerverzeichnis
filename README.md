@@ -1,17 +1,17 @@
 # Spielerverzeichnis & Statistiken
-Dieses Plugin erstellt eine Übersicht Spieler und Spielerinnen und ihren dazugehörigen Accounts. Eine sogenannte Wer-ist-Wer Liste. Neben dieser Liste gibt es persönliche Spieler-Statistiken und Charakter-Statistik. Auf diesen Statistik-Seiten werden die unterschiedlichsten Informationen und Statistikwerte zum Spieler bzw. zum Charakter ausgegeben.<br>
+Dieses Plugin erstellt eine Übersicht der Spieler und Spielerinnen und ihren zugehörigen Accounts. Eine sogenannte Wer-ist-Wer-Liste. Neben dieser Liste gibt es persönliche Spieler-Statistiken und Charakter-Statistiken. Auf diesen Statistik-Seiten werden die unterschiedlichsten Informationen und Statistikwerte zum Spieler bzw. zum Charakter ausgegeben.<br>
 Neben den vorgefertigten Statistiken und Diagrammen können im ACP auch eigene Statistiken für die Spieler-Statistik-Seite erstellt werden. Zum Beispiel eine Statistik, wie viele männliche, weibliche oder diverse Charaktere ein User besitzt. Genauere und ausführliche Informationen zu den Einstellungen, Möglichkeiten und eigenen Statistiken findet man im [Wiki](https://github.com/little-evil-genius/Spielerverzeichnis/wiki).<br>
 <br>
-Wem dieses Plugin zu komplex und umfangreich ist, hat die Möglichkeit das [Wer ist wer? 1.1 - Plugin](https://storming-gates.de/showthread.php?tid=19354&pid=135895#pid135895) von [melancholia](https://storming-gates.de/member.php?action=profile&uid=112) zu verwenden. Und/Oder das Tutorial [Spielerübersicht mit Statistiken - Storming Gates](https://storming-gates.de/showthread.php?tid=1015591&pid=480982#pid480982) | [Spielerübersicht mit Statistiken - Epic](https://epic.quodvide.de/showthread.php?tid=1109&pid=5112#pid5112) von [sparks fly](https://epic.quodvide.de/member.php?action=profile&uid=10) einzubauen. Wer Interesse an Diagrammen hat kann, wie ich auch, Diagramm mithilfe der open source Lösung [Chart.js](https://www.chartjs.org/) bauen oder sich das Tutorial [Charts mit Hilfe von Googles Developer erstellen](https://storming-gates.de/showthread.php?tid=1017740&pid=495004#pid495004) von [Ales](https://storming-gates.de/member.php?action=profile&uid=279) anschauen.<br>
+Wem dieses Plugin zu komplex und umfangreich ist, hat die Möglichkeit das [Wer ist wer? 1.1 - Plugin](https://storming-gates.de/showthread.php?tid=19354&pid=135895#pid135895) von [melancholia](https://storming-gates.de/member.php?action=profile&uid=112) zu verwenden. Und/Oder das Tutorial [Spielerübersicht mit Statistiken - Storming Gates](https://storming-gates.de/showthread.php?tid=1015591&pid=480982#pid480982) | [Spielerübersicht mit Statistiken - Epic](https://epic.quodvide.de/showthread.php?tid=1109&pid=5112#pid5112) von [sparks fly](https://epic.quodvide.de/member.php?action=profile&uid=10) einzubauen. Wer Interesse an Diagrammen hat, der kann, wie ich auch, die Diagramme mit Hilfe der open source Lösung [Chart.js](https://www.chartjs.org/) bauen oder sich das Tutorial [Charts mit Hilfe von Googles Developer erstellen](https://storming-gates.de/showthread.php?tid=1017740&pid=495004#pid495004) von [Ales](https://storming-gates.de/member.php?action=profile&uid=279) anschauen.<br>
 <br>
 <b>HINWEIS:</b><br>
 Das Plugin ist kompatibel mit den klassischen Profilfeldern von MyBB und/oder dem <a href="https://github.com/katjalennartz/application_ucp">Steckbrief-Plugin von Risuena</a>.<br>
-Auch ist das Plugin mit verschiedenen Inplaytracker/Szenentracker kompatibel: mit dem <a href="https://github.com/its-sparks-fly/Inplaytracker-2.0">Inplaytracker 2.0 von sparks fly</a>, dem Nachfolger <a href="https://github.com/ItsSparksFly/mybb-inplaytracker">Inplaytracker 3.0 von sparks fly</a> und dem <a href="https://github.com/katjalennartz/scenetracker">Szenentracker von Risuena</a>.<br>
+Auch ist das Plugin mit verschiedenen Inplaytrackern/Szenentrackern kompatibel: mit dem <a href="https://github.com/its-sparks-fly/Inplaytracker-2.0">Inplaytracker 2.0 von sparks fly</a>, dem Nachfolger <a href="https://github.com/ItsSparksFly/mybb-inplaytracker">Inplaytracker 3.0 von sparks fly</a> und dem <a href="https://github.com/katjalennartz/scenetracker">Szenentracker von Risuena</a>.<br>
 Genauso kann auch das Listen-Menü angezeigt werden, wenn man das <a href="https://github.com/ItsSparksFly/mybb-lists">Automatische Listen-Plugin von sparks fly</a> verwendet. Beides muss nur vorher eingestellt werden.
 
 # Vorrausetzung
 - Der <a href="https://www.mybb.de/erweiterungen/18x/plugins-verschiedenes/enhanced-account-switcher/" target="_blank">Accountswitcher</a> von doylecc <b>muss</b> installiert sein. <br>
-- Für eine Ausgabe von einem zufälligen Inplayzitat wird das <a href="https://github.com/its-sparks-fly/Inplayzitate-2.0"> Inplayzitate 2.0</a> oder <a href="https://github.com/ItsSparksFly/mybb-inplayquotes">Inplayzitate 3.0</a> Plugin von sparks fly verwendet. Wenn man diese Option nicht möchte, muss keins der beiden Plugins installiert sein.
+- Für eine Ausgabe von einem zufälligen Inplayzitat wird das <a href="https://github.com/its-sparks-fly/Inplayzitate-2.0"> Inplayzitate 2.0</a> oder <a href="https://github.com/ItsSparksFly/mybb-inplayquotes">Inplayzitate 3.0</a> Plugin von sparks fly verwendet. Wenn man diese Option nicht möchte, muss keines der beiden Plugins installiert sein.
 
 # Datenbank-Änderungen
 ### hinzugefügte Tabelle:
@@ -56,7 +56,7 @@ Genauso kann auch das Listen-Menü angezeigt werden, wenn man das <a href="https
 - Listen Menü Template
 <br><br>
 <b>HINWEIS:</b><br>
-Einige Einstellungen sind abhängig voneinander und werden nur angezeigt, wenn bei einer anderen Einstellung Option 1 oder 2 ausgewählt wurde. 
+Einige Einstellungen sind abhängig voneinander und werden nur angezeigt, wenn bei einer anderen Einstellung Option 1 oder 2 ausgewählt wurde.
 
 # Neue Template-Gruppe innerhalb der Design-Templates
 - Spielerverzeichnis und Statistiken
