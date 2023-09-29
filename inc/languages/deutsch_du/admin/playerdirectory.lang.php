@@ -1,5 +1,6 @@
 <?php
 $l['playerdirectory_error_accountswitcher'] = "Das Plugin <a href=\"http://doylecc.altervista.org/bb/downloads.php?dlid=26&cat=2\" target=\"_blank\">\"Enhanced Account Switcher\"</a> muss installiert sein!";
+
 $l['playerdirectory_setting_title'] = "Spielerverzeichnis und Statistiken";
 $l['playerdirectory_setting_desc'] = "Einstellungen für das Spielerverzeichnis und die Statistiken";
 $l['playerdirectory_setting_directory'] = "Spielerverzeichnis aktivieren";
@@ -9,13 +10,13 @@ $l['playerdirectory_setting_directory_guest_desc'] = "Dürfen Gäste das Spieler
 $l['playerdirectory_setting_directory_multipage'] = "Spieleranzahl pro Seite";
 $l['playerdirectory_setting_directory_multipage_desc'] = "Wie viele Spieler sollen pro Seite im Spielerverzeichnis angezeigt werden (0 = Keine Beschränkung)?";
 $l['playerdirectory_setting_directory_teamaccounts'] = "Ausgeschlossene Accounts";
-$l['playerdirectory_setting_directory_teamaccounts_desc'] = "Gibt es Accounts, welche nicht im Spielerverzeichnis aufgelistet werden sollen? Gib durch Kommata getrennt die UIDs der Accounts an. <b>Hinweis:</b> Sollt es sich um ein Hauptaccount handeln, werden auch alle Accounts die an diesem Account angehangen sind nicht aufgelistet.";
+$l['playerdirectory_setting_directory_teamaccounts_desc'] = "Gibt es Accounts, welche nicht im Spielerverzeichnis aufgelistet werden sollen? Gib durch Kommata getrennt die UIDs der Accounts an. <b>Hinweis:</b> Sollte es sich um einen Hauptaccount handeln, werden auch alle Accounts die an diesem Account angehängt sind nicht aufgelistet.";
 $l['playerdirectory_setting_playerstat'] = "Spieler-Statistik aktivieren";
-$l['playerdirectory_setting_playerstat_desc'] = "Sollen die persönlichen Statistik für jeden User aktiviert werden?";
+$l['playerdirectory_setting_playerstat_desc'] = "Sollen die persönlichen Statistiken für jeden User aktiviert werden?";
 $l['playerdirectory_setting_playerstat_guest'] = "Gästeberechtigung";
 $l['playerdirectory_setting_playerstat_guest_desc'] = "Dürfen Gäste die persönlichen Spieler-Statistiken sehen?";
 $l['playerdirectory_setting_characterstat'] = "Charakter-Statistik aktivieren";
-$l['playerdirectory_setting_characterstat_desc'] = "Sollen die persönlichen Statistik für jeden Charakter aktiviert werden?";
+$l['playerdirectory_setting_characterstat_desc'] = "Sollen die persönlichen Statistiken für jeden Charakter aktiviert werden?";
 $l['playerdirectory_setting_characterstat_guest'] = "Gästeberechtigung";
 $l['playerdirectory_setting_characterstat_guest_desc'] = "Dürfen Gäste die persönlichen Charakter-Statistiken sehen?";
 $l['playerdirectory_setting_profilfeldsystem'] = "Profilfeldsystem";
@@ -24,7 +25,7 @@ $l['playerdirectory_setting_profilfeldsystem_profilefield'] = "klassische Profil
 $l['playerdirectory_setting_profilfeldsystem_applicationfield'] = "Steckbrief-Plugin";
 $l['playerdirectory_setting_profilfeldsystem_both'] = "beide Varianten";
 $l['playerdirectory_setting_playername'] = "Spielername";
-$l['playerdirectory_setting_playername_desc'] = "Wie lautet die FID / der Identifikator von dem Profilfeld/Steckbrieffeld für den Spielername?<br>
+$l['playerdirectory_setting_playername_desc'] = "Wie lautet die FID / der Identifikator von dem Profilfeld/Steckbrieffeld für den Spielernamen?<br>
 <b>Hinweis:</b> Bei klassischen Profilfeldern muss eine Zahl eintragen werden. Bei dem Steckbrief-Plugin von Risuena muss der Name/Identifikator des Felds eingetragen werden.";
 $l['playerdirectory_setting_avatar_default'] = "Standard-Avatar";
 $l['playerdirectory_setting_avatar_default_desc'] = "Wie heißt die Bilddatei, für die Standard-Avatare? Damit der Avatar für jedes Design richtig angezeigt wird, sollte der Namen in allen Designs gleich sein. Sprich in jedem Themen-Pfad muss eine Datei mit diesem Namen vorhanden sein.";
@@ -42,7 +43,7 @@ $l['playerdirectory_setting_birthday_age_field'] = "Feld fürs Alter";
 $l['playerdirectory_setting_birthday_age_field_desc'] = "Wie lautet die FID / der Identifikator von dem Profilfeld/Steckbrieffeld für das Alter der Charaktere?<br>
 <b>Hinweis:</b> Bei klassischen Profilfeldern muss eine Zahl eintragen werden. Bei dem Steckbrief-Plugin von Risuena muss der Name/Identifikator des Felds eingetragen werden.";
 $l['playerdirectory_setting_inplayday'] = "Letzter Inplaytag";
-$l['playerdirectory_setting_inplayday_desc'] = "Gib den letzten Tag des Inplayzeitraums ein, um das Alter der Charaktere richtig zu berechnen zu lassen. <b>Achtung!</b> Bei Zeitsprüngen muss das Datum angepasst werden.";
+$l['playerdirectory_setting_inplayday_desc'] = "Gib den letzten Tag des Inplayzeitraums ein, um das Alter der Charaktere richtig berechnen zu lassen. <b>Achtung!</b> Bei Zeitsprüngen muss das Datum angepasst werden.";
 $l['playerdirectory_setting_inplaytracker'] = "Inplaytracker";
 $l['playerdirectory_setting_inplaytracker_desc'] = "Welches Inplaytracker-Plugin wird verwendet?";
 $l['playerdirectory_setting_inplaytracker_jule2'] = "Inplaytracker 2.0 von sparks fly";
@@ -54,31 +55,31 @@ $l['playerdirectory_setting_inplaystat_desc'] = "Soll eine Inplaypost-Statistik 
 $l['playerdirectory_setting_inplaystat_none'] = "keine Statistik";
 $l['playerdirectory_setting_inplaystat_bar'] = "als Säulendiagramm";
 $l['playerdirectory_setting_inplaystat_word'] = "nur der Monat und die Zahl";
-$l['playerdirectory_setting_scenestat'] = "Szenenanzahl pro Charakter - Statistik";
+$l['playerdirectory_setting_scenestat'] = "Szenenanzahl pro Charakter-Statistik";
 $l['playerdirectory_setting_scenestat_desc'] = "Soll eine Statistik angezeigt werden, welche die Anzahl aller Szenen der eigenen Charaktere gegenüber stellt?";
 $l['playerdirectory_setting_scenestat_none'] = "keine Statistik";
 $l['playerdirectory_setting_scenestat_bar'] = "als Säulendiagramm";
 $l['playerdirectory_setting_scenestat_pie'] = "als Kreisdiagramm";
 $l['playerdirectory_setting_scenestat_word'] = "nur der Charaktername und die Zahl";
 $l['playerdirectory_setting_scenestat_legend'] = "Szenenanzahl-Statistik - Legende";
-$l['playerdirectory_setting_scenestat_legend_desc'] = "Soll neben dem Kreisdiagramm eine Legende angezeigt werden mit dem jeweiligen Namen und entsprechenden Farbe?<br><b>Hinweis:</b> Bei einer zu großen Anzahl von Charakteren könnte die Legende zu massiv und überladen wirken. Wenn über Kreisflächen gefahren wird oder anklickt werden mit der Maus, sieht man den Namen und die Anzahl.";
-$l['playerdirectory_setting_poststat'] = "Inplaypostanzahl pro Charakter - Statistik";
+$l['playerdirectory_setting_scenestat_legend_desc'] = "Soll neben dem Kreisdiagramm eine Legende angezeigt werden mit dem jeweiligen Namen und entsprechenden Farbe?<br><b>Hinweis:</b> Bei einer zu großen Anzahl von Charakteren könnte die Legende zu massiv und überladen wirken. Wenn über Kreisflächen gefahren wird oder mit der Maus angeklickt werden, sieht man den Namen und die Anzahl.";
+$l['playerdirectory_setting_poststat'] = "Inplaypostanzahl pro Charakter-Statistik";
 $l['playerdirectory_setting_poststat_desc'] = "Soll eine Statistik angezeigt werden, welche die Anzahl aller Inplayposts der eigenen Charaktere gegenüber stellt??";
 $l['playerdirectory_setting_poststat_none'] = "keine Statistik";
 $l['playerdirectory_setting_poststat_bar'] = "als Säulendiagramm";
 $l['playerdirectory_setting_poststat_pie'] = "als Kreisdiagramm";
 $l['playerdirectory_setting_poststat_word'] = "nur der Charaktername und die Zahl";
 $l['playerdirectory_setting_poststat_legend'] = "Inplaypostanzahl-Statistik - Legende";
-$l['playerdirectory_setting_poststat_legend_desc'] = "Soll neben dem Kreisdiagramm eine Legende angezeigt werden mit dem jeweiligen Namen und entsprechenden Farbe?<br><b>Hinweis:</b> Bei einer zu großen Anzahl von Charakteren könnte die Legende zu massiv und überladen wirken. Wenn über Kreisflächen gefahren wird oder anklickt werden mit der Maus, sieht man den Namen und die Anzahl.";
+$l['playerdirectory_setting_poststat_legend_desc'] = "Soll neben dem Kreisdiagramm eine Legende angezeigt werden mit dem jeweiligen Namen und entsprechenden Farbe?<br><b>Hinweis:</b> Bei einer zu großen Anzahl von Charakteren könnte die Legende zu massiv und überladen wirken. Wenn über Kreisflächen gefahren wird oder mit der Maus angeklickt werden, sieht man den Namen und die Anzahl.";
 $l['playerdirectory_setting_colorstat'] = "Farben für die Säulen/Kreisflächen";
-$l['playerdirectory_setting_colorstat_desc'] = "Trage hier Farben (Hex-Codes) mit einem Koma getrennt. Diese Auswahl dienen als Farben für die Säulen bzw. Kreisflächen bei der Gegenüberstellung Szenenanzahl-Statistik und Inplaypostanzahl-Statistik pro Charakter.<br> Solltet ihr 20 Farben angeben, doch es gibt Spieler, die mehr als 20 Accounts/Charaktere besitzen wiederholen sich die Farben.";
+$l['playerdirectory_setting_colorstat_desc'] = "Trage hier Farben (Hex-Codes), mit einem Koma getrennt, ein. Diese Auswahl dienen als Farben für die Säulen bzw. Kreisflächen bei der Gegenüberstellung Szenenanzahl-Statistik und Inplaypostanzahl-Statistik pro Charakter.<br> Solltet ihr 20 Farben angeben, doch es gibt Spieler, die mehr als 20 Accounts/Charaktere besitzen wiederholen sich die Farben.";
 $l['playerdirectory_setting_inplayquotes'] = "Inplayzitate";
-$l['playerdirectory_setting_inplayquotes_desc'] = "Sollen auf den Spieler- und Charakter-Statistik Seiten, wenn vorhanden ein random Inplayzitat von dem User bzw. Charakter angezeigt werden?";
+$l['playerdirectory_setting_inplayquotes_desc'] = "Sollen auf den Spieler- und Charakter-Statistik Seiten, wenn vorhanden, ein random Inplayzitat von dem User bzw. Charakter angezeigt werden?";
 $l['playerdirectory_setting_lists'] = "Listen PHP";
 $l['playerdirectory_setting_lists_desc'] = "Wie heißt die Hauptseite der Listen-Seite? Dies dient zur Ergänzung der Navigation. Falls nicht gewünscht einfach leer lassen.";
 $l['playerdirectory_setting_lists_menu'] = "Listen Menü";
 $l['playerdirectory_setting_lists_menu_desc'] = "Soll über die Variable {\$lists_menu} das Menü der Listen aufgerufen werden? Standardmäßig wird das Menü nur auf der Seite vom Spielerverzeichnis angezeigt.<br>
-Wenn ja, muss noch angegeben werden, ob eine eigene PHP-Datei oder das Automatische Listen-Plugin von sparks fly genutzt?";
+Wenn ja, muss noch angegeben werden, ob eine eigene PHP-Datei oder das Automatische Listen-Plugin von sparks fly genutzt wird.";
 $l['playerdirectory_setting_lists_menu_none'] = "keine Menü-Anzeige";
 $l['playerdirectory_setting_lists_menu_jule'] = "automatisches Listen-Plugin";
 $l['playerdirectory_setting_lists_menu_own'] = "eigene Listen/PHP-Datei";
@@ -103,7 +104,7 @@ $l['playerdirectory_manage_overview_stat_fieldsystem_profilefield'] = "Profilfel
 $l['playerdirectory_manage_overview_stat_fieldsystem_applicationfield'] = "Steckbrieffeld";
 $l['playerdirectory_manage_overview_stat_observe_primary'] = "nur primär beachten";
 $l['playerdirectory_manage_overview_stat_observe_secondary'] = "nur sekundär beachten";
-$l['playerdirectory_manage_overview_stat_observe_both'] = "primär udn sekundär beachten";
+$l['playerdirectory_manage_overview_stat_observe_both'] = "primär und sekundär beachten";
 $l['playerdirectory_manage_overview_stat_usergroups'] = "Benutzergruppen";
 $l['playerdirectory_manage_overview_stat_field'] = "{1}: {2}";
 $l['playerdirectory_manage_overview_stat_dataoptions'] = "Optionen: {1}";
@@ -126,7 +127,7 @@ $l['playerdirectory_manage_add_name_desc'] = "Wie lautet der Titel für die Stat
 $l['playerdirectory_manage_add_identification'] = "Identifikator <em>*</em>";
 $l['playerdirectory_manage_add_identification_desc'] = "Dieser Titel dient als Name für die Variabel Bezeichnung im Template. Es sind keine Sonderzeichen oder Leerzeichen erlaubt (maschinenlesbar). Der Name muss für jedes Feld unterschiedlich sein.";
 $l['playerdirectory_manage_add_type'] = "Darstellungsart<em>*</em>";
-$l['playerdirectory_manage_add_type_desc'] = "Wie soll die später Statistik dargestellt werden?";
+$l['playerdirectory_manage_add_type_desc'] = "Wie soll die spätere Statistik dargestellt werden?";
 $l['playerdirectory_manage_add_type_select'] = "Darstellungsart auswählen";
 $l['playerdirectory_manage_add_dataselect'] = "Auszählungsdaten<em>*</em>";
 $l['playerdirectory_manage_add_dataselect_desc'] = "Aus welcher Option sollen die Daten für die Statistik gezogen werden?<br>Bei der Option Profilfeld bzw. Steckbrieffeld stehen alle Felder zur Verfügung, wo man eine feste Antwort auswählen kann.";
@@ -140,7 +141,7 @@ $l['playerdirectory_manage_add_applicationfield'] = "Steckbrieffeld <em>*</em>";
 $l['playerdirectory_manage_add_applicationfield_desc'] = "Wähle das gewünschte Steckbrieffeld aus. Aus den Auswahlmöglichkeiten werden später die einzelnen Daten gezogen.<br>Zum Beispiel, das Feld Geschlecht mit der Auswahl: Weiblich, Männlich, Divers. Dann wird die Statistik später drei Werte haben.";
 $l['playerdirectory_manage_add_nonefields'] = "alle Felder sind schon in Gebrauch";
 $l['playerdirectory_manage_add_ignor'] = "Ignorierende Auswahlmöglichkeiten";
-$l['playerdirectory_manage_add_ignor_desc'] = "Manche Profilfeld bzw. Steckbrieffeld besitzen Auswahlmöglichkeiten, welche nur als Platzhalter oder zum rauslöschen dienen. Diese können hier aufgelistet werden, damit sie rausgelöscht werden. Mehre Werte durch ein , trennen.<br>Gibt dafür die Postition/Reihenfolgenzahl von dem Wert an.<br>Beispiel: keine Angabe Stadt 1 Stadt 2 => keine Angabe soll raus, also 1 angeben.";
+$l['playerdirectory_manage_add_ignor_desc'] = "Manche Profilfelder bzw. Steckbrieffelder besitzen Auswahlmöglichkeiten, welche nur als Platzhalter oder zum rauslöschen dienen. Diese können hier aufgelistet werden, damit sie rausgelöscht werden. Mehre Werte durch ein , trennen.<br>Gibt dafür die Postition/Reihenfolgenzahl von dem Wert an.<br>Beispiel: keine Angabe, Stadt 1, Stadt 2 => keine Angabe soll raus, also 1 angeben.";
 $l['playerdirectory_manage_add_usergroups'] = "Benutzergruppen<em>*</em>";
 $l['playerdirectory_manage_add_usergroups_desc'] = "Wähle die Gruppen aus, die gezählt werden sollen.";
 $l['playerdirectory_manage_add_groupoption'] = "Gruppeneinstellung<em>*</em>";
@@ -165,7 +166,7 @@ $l['playerdirectory_manage_add_error_dataselect'] = "Du hast nichts ausgewählt,
 $l['playerdirectory_manage_add_error_field'] = "Du hast kein {1} ausgewählt.";
 $l['playerdirectory_manage_add_error_nonefield'] = "Du hast alle geigneten {1} schon in einer Statistik ausgegeben.";
 $l['playerdirectory_manage_add_error_usergroups_none'] = "Du hast keine Benutzergruppen für diese Statistik ausgewählt.";
-$l['playerdirectory_manage_add_error_usergroups_few'] = "Du hast musst mindestens zwei Benutzergruppen für die Statistiken auswählen.";
+$l['playerdirectory_manage_add_error_usergroups_few'] = "Du musst mindestens zwei Benutzergruppen für die Statistiken auswählen.";
 $l['playerdirectory_manage_add_error_groupoption'] = "Du hast keine Gruppeneinstellung für diese Statistik ausgewählt.";
 $l['playerdirectory_manage_add_logadmin'] = "Eine neue Statistik wurde hinzugefügt ";
 $l['playerdirectory_manage_add_flash'] = "Die neue Statistik wurde erfolgreich erstellt.";
