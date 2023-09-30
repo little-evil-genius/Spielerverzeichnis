@@ -105,3 +105,44 @@ Es wird automatisch in jedes bestehende und neue Design hinzugefügt. Man sollte
 - euerforum.de/misc.php?action=playerdirectory
 - euerforum.de/misc.php?action=playerstatistic&uid=X
 - euerforum.de/misc.php?action=characterstatistic&uid=X
+
+# Demo Screenshots
+### Spielerverzeichnis
+<img src="https://stormborn.at/plugins/spielerverzeichnis_main.png">
+
+### Spielerverzeichnis/Statistik
+<img src="https://stormborn.at/plugins/spielerverzeichnis_spieler_inplay.png">
+<br><br>
+<img src="https://stormborn.at/plugins/spielerverzeichnis_spieler_character.png">
+
+### die letzten 12 Monate
+<img src="https://stormborn.at/plugins/spielerverzeichnis_spieler_12monts_bar.png">
+<br><br>
+<img src="https://stormborn.at/plugins/spielerverzeichnis_spieler_12monts.png">
+
+### Szenen/Inplaypost pro Charakter
+<img src="https://stormborn.at/plugins/spielerverzeichnis_spieler_perChara_pie.png">
+
+<img src="https://stormborn.at/plugins/spielerverzeichnis_spieler_perChara_bar.png">
+
+<img src="https://stormborn.at/plugins/spielerverzeichnis_spieler_perChara.png">
+
+<img src="https://stormborn.at/plugins/spielerverzeichnis_spieler_perChara_beides.png">
+
+### Charakterverzeichnis/Charakterstatistik
+<img src="https://stormborn.at/plugins/spielerverzeichnis_character.png">
+
+### Einstellungen & Hinweis
+<img src="https://stormborn.at/plugins/spielerverzeichnis_ucp.png">
+
+<img src="https://stormborn.at/plugins/spielerverzeichnis_notice.png">
+
+## Eigene Statistiken
+### Übersicht
+<img src="https://stormborn.at/plugins/spielerverzeichnis_spieler_own_acp.png">
+
+### Hinzufügen
+<img src="https://stormborn.at/plugins/spielerverzeichnis_spieler_own_acp_add.png">
+
+### Spielerstatistik
+<img src="https://stormborn.at/plugins/spielerverzeichnis_spieler_own.png">
