@@ -118,14 +118,14 @@ function playerdirectory_install(){
 			'disporder' => 2
 		),
 		'playerdirectory_directory_multipage' => array(
-			'title' => $lang->playerdirectory_setting_multipage,
+			'title' => $lang->playerdirectory_setting_directory_multipage,
 			'description' => $lang->playerdirectory_setting_directory_multipage_desc,
 			'optionscode' => 'numeric',
 			'value' => '20', // Default
 			'disporder' => 3
 		),
 		'playerdirectory_directory_teamaccounts' => array(
-			'title' => $lang->playerdirectory_setting_teamaccounts,
+			'title' => $lang->playerdirectory_setting_directory_teamaccounts,
 			'description' => $lang->playerdirectory_setting_directory_teamaccounts_desc,
 			'optionscode' => 'text',
 			'value' => '1', // Default
