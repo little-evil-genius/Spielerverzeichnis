@@ -4077,8 +4077,9 @@ function playerdirectory_misc(){
 
 			// LEER LAUFEN LASSEN
 			$charaID = "";
-			$charactername_formated = "";
             $charactername = "";
+			$charactername_formated = "";
+            $charactername_link = "";
             $first_name = "";
             $last_name = "";
             $avatar_url = "";
@@ -4092,12 +4093,13 @@ function playerdirectory_misc(){
 			$userids .= $char['uid'].",";
 
 			// CHARACTER NAME
+            $charactername = $char['username'];
             // mit Gruppenfarbe
-			$charactername_formated = build_profile_link(format_name($char['username'], $char['usergroup'], $char['displaygroup']), $charaID);	
+			$charactername_formated = build_profile_link(format_name($charactername, $char['usergroup'], $char['displaygroup']), $charaID);	
             // Nur Link
-            $charactername = build_profile_link($char['username'], $charaID);
+            $charactername_link = build_profile_link($charactername, $charaID);
             // Name gesplittet
-            $fullname = explode(" ", $char['username']);
+            $fullname = explode(" ", $charactername);
             $first_name = array_shift($fullname);
             $last_name = implode(" ", $fullname); 
 
