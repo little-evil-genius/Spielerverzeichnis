@@ -3675,20 +3675,33 @@ function playerdirectory_misc(){
                 // Alter
                 // automatisches berechnen
                 if ($birthday_option != 2) {
-                    // klassisches Profilfeld
-                    if (is_numeric($birthday_field)) {
-                        if(!empty($character[$birthday_fid])) {
-                            $birthday = new DateTime($character[$birthday_fid]);
-                            $interval = $ingame->diff($birthday);
-                            $age = $interval->format("%Y");
-                        } else {
-                            $age = "00";
+                    // Profilfeld/Steckbrieffeld
+                    if ($birthday_option == 0) {
+                        // klassisches Profilfeld
+                        if (is_numeric($birthday_field)) {
+                            if(!empty($character[$birthday_fid])) {
+                                $birthday = new DateTime($character[$birthday_fid]);
+                                $interval = $ingame->diff($birthday);
+                                $age = $interval->format("%Y");
+                            } else {
+                                $age = "00";
+                            }
+                        } 
+                        // Steckbrief Plugin
+                        else {
+                            if(!empty($character[$birthday_field])) {
+                                $birthday = new DateTime($character[$birthday_field]);
+                                $interval = $ingame->diff($birthday);
+                                $age = $interval->format("%Y");
+                            } else {
+                                $age = "00";
+                            }
                         }
                     } 
-                    // Steckbrief Plugin
+                    // MyBB Geburtstagsfeld
                     else {
-                        if(!empty($character[$birthday_field])) {
-                            $birthday = new DateTime($character[$birthday_field]);
+                        if(!empty($character['birthday'])) {
+                            $birthday = new DateTime($character['birthday']);
                             $interval = $ingame->diff($birthday);
                             $age = $interval->format("%Y");
                         } else {
@@ -4113,20 +4126,33 @@ function playerdirectory_misc(){
             // ALTER
             // automatisches berechnen
             if ($birthday_option != 2) {
-                // klassisches Profilfeld
-                if (is_numeric($birthday_field)) {
-                    if(!empty($char[$birthday_fid])) {
-                        $birthday = new DateTime($char[$birthday_fid]);
-                        $interval = $ingame->diff($birthday);
-                        $age = $interval->format("%Y");
-                    } else {
-                        $age = "00";
+                // Profilfeld/Steckbrieffeld
+                if ($birthday_option == 0) {
+                    // klassisches Profilfeld
+                    if (is_numeric($birthday_field)) {
+                        if(!empty($char[$birthday_fid])) {
+                            $birthday = new DateTime($char[$birthday_fid]);
+                            $interval = $ingame->diff($birthday);
+                            $age = $interval->format("%Y");
+                        } else {
+                            $age = "00";
+                        }
+                    } 
+                    // Steckbrief Plugin
+                    else {
+                        if(!empty($char[$birthday_field])) {
+                            $birthday = new DateTime($char[$birthday_field]);
+                            $interval = $ingame->diff($birthday);
+                            $age = $interval->format("%Y");
+                        } else {
+                            $age = "00";
+                        }
                     }
                 } 
-                // Steckbrief Plugin
+                // MyBB Geburtstagsfeld
                 else {
-                    if(!empty($char[$birthday_field])) {
-                        $birthday = new DateTime($char[$birthday_field]);
+                    if(!empty($char['birthday'])) {
+                        $birthday = new DateTime($char['birthday']);
                         $interval = $ingame->diff($birthday);
                         $age = $interval->format("%Y");
                     } else {
@@ -4807,7 +4833,7 @@ function playerdirectory_misc(){
             $bday_array = [];
             while($bdays = $db->fetch_array($query_birthdays)) {
                 $username = $bdays['username'];
-                $bday_array[$username] = $bdays[$birthday];
+                $bday_array[$username] = $bdays['birthday'];
             } 
         }
         // Nur Alter
@@ -5532,20 +5558,33 @@ function playerdirectory_misc(){
         // ALTER
         // automatisches berechnen
         if ($birthday_option != 2) {
-            // klassisches Profilfeld
-            if (is_numeric($birthday_field)) {
-                if(!empty($characterstat[$birthday_fid])) {
-                    $birthday = new DateTime($characterstat[$birthday_fid]);
-                    $interval = $ingame->diff($birthday);
-                    $age = $interval->format("%Y");
-                } else {
-                    $age = "00";
+            // Profilfeld/Steckbriefeld
+            if ($birthday_option == 0) {
+                // klassisches Profilfeld
+                if (is_numeric($birthday_field)) {
+                    if(!empty($characterstat[$birthday_fid])) {
+                        $birthday = new DateTime($characterstat[$birthday_fid]);
+                        $interval = $ingame->diff($birthday);
+                        $age = $interval->format("%Y");
+                    } else {
+                        $age = "00";
+                    }
+                } 
+                // Steckbrief Plugin
+                else {
+                    if(!empty($characterstat[$birthday_field])) {
+                        $birthday = new DateTime($characterstat[$birthday_field]);
+                        $interval = $ingame->diff($birthday);
+                        $age = $interval->format("%Y");
+                    } else {
+                        $age = "00";
+                    }
                 }
             } 
-            // Steckbrief Plugin
+            // MyBB Geburtstagsfeld
             else {
-                if(!empty($characterstat[$birthday_field])) {
-                    $birthday = new DateTime($characterstat[$birthday_field]);
+                if(!empty($characterstat['birthday'])) {
+                    $birthday = new DateTime($characterstat['birthday']);
                     $interval = $ingame->diff($birthday);
                     $age = $interval->format("%Y");
                 } else {
