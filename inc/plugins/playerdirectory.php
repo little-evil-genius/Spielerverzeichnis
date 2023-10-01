@@ -3422,7 +3422,7 @@ function playerdirectory_misc(){
                 $upper = $allPlayers;
             }
     
-            $page_url = htmlspecialchars_uni("misc.php?action=players");
+            $page_url = htmlspecialchars_uni("misc.php?action=playerdirectory");
     
             $multipage = multipage($allPlayers, $perpage, $input_page, $page_url);
 
