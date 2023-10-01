@@ -6172,7 +6172,7 @@ function playerdirectory_usercp_options() {
 
                 $nameID = "playerdirectory_characterstat_guest";
                 $checked = $playerdirectory_characterstat_guest;
-                $option_text = $lang->playerdirectory_usercp_options_characterstat;
+                $option_text = $lang->playerdirectory_usercp_options_characterstat_guest;
 
                 eval("\$option_characterstat_guest = \"".$templates->get("playerdirectory_usercp_options_bit")."\";");
             } else {
