@@ -81,7 +81,7 @@ $l['playerdirectory_playerstat_ownstat_name'] = "Charaktere nach {1}";
 $l['playerdirectory_usercp_options'] = "Statistiken";
 $l['playerdirectory_usercp_options_playerstat'] = "Dürfen andere User deine persönliche Spielerstatistik sehen?";
 $l['playerdirectory_usercp_options_playerstat_guest'] = "Dürfen Gäste deine persönliche Spielerstatistik sehen?";
-$l['playerdirectory_usercp_options_characterstat'] = "Dürfen andere Spieler deine persönlichen Charakterstatistiken sehen?";
+$l['playerdirectory_usercp_options_characterstat'] = "Dürfen andere User deine persönlichen Charakterstatistiken sehen?";
 $l['playerdirectory_usercp_options_characterstat_guest'] = "Dürfen Gäste deine persönlichen Charakterstatistiken sehen?";;
 $l['playerdirectory_online_location_playerdirectory'] = "Schaut sich das <a href=\"misc.php?action=playerdirectory\">Spielerverzeichnis</a> an.";
 $l['playerdirectory_online_location_playerstatistic'] = "Schaut sich gerade die <a href=\"misc.php?action=playerstatistic&uid={1}\">Spielerstatistik von <b>{2}</b></a> an.";
