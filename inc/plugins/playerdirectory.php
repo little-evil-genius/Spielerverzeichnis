@@ -2220,6 +2220,9 @@ function playerdirectory_admin_manage() {
                 }
                 if (($mybb->get_input('type') != 3 OR $mybb->get_input('type') != 0) AND !empty($mybb->get_input('colors')) AND !empty($mybb->get_input('applicationfield'))){
 
+                    // Zählen, wie viele Farben angegeben + weil letztes Komma abgeschnitten
+                    $comma = substr_count($mybb->get_input('colors'), ',')+1;
+                    
                     // Daten Optionen
                     $options = $db->fetch_field($db->simple_select("application_ucp_fields", "options", "fieldname = '".$mybb->get_input('applicationfield')."'"), "options");
                     
@@ -2458,21 +2461,23 @@ function playerdirectory_admin_manage() {
             // Profilfeld/Steckbrieffeld
             // Feld ID / Feld identifikator
             // Profilfeld
-            $count_profilefields = $db->num_rows($query_profilefields);
-            if ($count_profilefields > 0) {
-                $form_container->output_row(
-                    $lang->playerdirectory_manage_add_profilefield, 
-                    $lang->playerdirectory_manage_add_profilefield_desc, 
-                    $form->generate_select_box('profilefield', $profilefield_list, $mybb->get_input('profilefield'), array('id' => 'profilefield', 'size' => 5)),
-                    'profilefield', array(), array('id' => 'row_profilefield')
-                );
-            } else {
-                $form_container->output_row(
-                    $lang->playerdirectory_manage_add_profilefield,
-                    $lang->playerdirectory_manage_add_profilefield_desc,
-                    $form->generate_select_box('profilefield', $nonefields_list, $mybb->get_input('profilefield'), array('id' => 'profilefield')),
-                    'profilefield', array(), array('id' => 'row_profilefield')
-                );
+            if ($profilfeldsystem != 1) { 
+                $count_profilefields = $db->num_rows($query_profilefields);
+                if ($count_profilefields > 0) {
+                    $form_container->output_row(
+                        $lang->playerdirectory_manage_add_profilefield, 
+                        $lang->playerdirectory_manage_add_profilefield_desc, 
+                        $form->generate_select_box('profilefield', $profilefield_list, $mybb->get_input('profilefield'), array('id' => 'profilefield', 'size' => 5)),
+                        'profilefield', array(), array('id' => 'row_profilefield')
+                    );
+                } else {
+                    $form_container->output_row(
+                        $lang->playerdirectory_manage_add_profilefield,
+                        $lang->playerdirectory_manage_add_profilefield_desc,
+                        $form->generate_select_box('profilefield', $nonefields_list, $mybb->get_input('profilefield'), array('id' => 'profilefield')),
+                        'profilefield', array(), array('id' => 'row_profilefield')
+                    );
+                }
             }
             // Steckbrieffeld
             if ($profilfeldsystem != 0) { 
@@ -2958,12 +2963,14 @@ function playerdirectory_admin_manage() {
             // Profilfeld/Steckbrieffeld
             // Feld ID / Feld identifikator
             // Profilfeld
-            $form_container->output_row(
-                $lang->playerdirectory_manage_add_profilefield, 
-                $lang->playerdirectory_manage_add_profilefield_desc, 
-                $form->generate_select_box('profilefield', $profilefield_list, $statistic['field'], array('id' => 'profilefield', 'size' => 5)),
-                'profilefield', array(), array('id' => 'row_profilefield')
-            );
+            if ($profilfeldsystem != 1) {
+                $form_container->output_row(
+                    $lang->playerdirectory_manage_add_profilefield, 
+                    $lang->playerdirectory_manage_add_profilefield_desc, 
+                    $form->generate_select_box('profilefield', $profilefield_list, $statistic['field'], array('id' => 'profilefield', 'size' => 5)),
+                    'profilefield', array(), array('id' => 'row_profilefield')
+                );
+            }
             // Steckbrieffeld
             if ($profilfeldsystem != 0) {
                 $form_container->output_row(
