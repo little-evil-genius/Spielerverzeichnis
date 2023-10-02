@@ -2949,7 +2949,7 @@ function playerdirectory_admin_manage() {
             $form_container->output_row(
                 $lang->playerdirectory_manage_add_type, 
                 $lang->playerdirectory_manage_add_type_desc, 
-                $form->generate_select_box('type', $typeselect_list, $statistic['type'], array('id' => 'type')),
+                $form->generate_select_box('type', $typeselect_list, $statistic['type'], array('id' => 'type'))
             );
     
             // Profilfelder oder Usergruppe
