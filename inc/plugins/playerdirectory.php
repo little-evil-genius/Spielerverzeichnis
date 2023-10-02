@@ -3645,9 +3645,10 @@ function playerdirectory_misc(){
                 // Inplaytracker von Ales
                 else if ($inplaytrackersystem == 4) {
                     $sceneTIDs = "";
+                    $scene_username = get_user($characterID)['username'];
                     // Szenen des Users auslesen - TID
                     $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
-                    WHERE (concat(',',spieler,',') LIKE '%,".$charaID.",%')
+                    WHERE (concat(',',spieler,',') LIKE '%,".$scene_username.",%')
                     ORDER by tid ASC                
                     ");     
     
@@ -3964,7 +3965,7 @@ function playerdirectory_misc(){
             // Inplaytracker von little.evil.genius
             else if ($inplaytrackersystem == 3) {
                 $sceneTIDs = "";
-                foreach ($userids_array as $userID) {
+                foreach ($userids_array as $userID) {                  
                     // Szenen des Users auslesen - TID
                     $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."inplayscenes
                     WHERE (concat(',',partners,',') LIKE '%,".$userID.",%')
@@ -3980,16 +3981,19 @@ function playerdirectory_misc(){
             // Inplaytracker von Ales
             else if ($inplaytrackersystem == 4) {
                 $sceneTIDs = "";
-                // Szenen des Users auslesen - TID
-                $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
-                WHERE (concat(',',spieler,',') LIKE '%,".$charaID.",%')
-                ORDER by tid ASC                
-                ");     
+                foreach ($userids_array as $userID) {
+                    $scene_username = get_user($userID)['username'];
+                    // Szenen des Users auslesen - TID
+                    $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
+                    WHERE (concat(',',spieler,',') LIKE '%,".$scene_username.",%')
+                    ORDER by tid ASC    
+                    ");     
 
-                while ($allcharscenes = $db->fetch_array($query_allcharscenes)){
-                    // Mit Infos füllen
-                    $sceneTIDs .= $allcharscenes['tid'].",";
-                } 
+                    while ($allcharscenes = $db->fetch_array($query_allcharscenes)){
+                        // Mit Infos füllen
+                        $sceneTIDs .= $allcharscenes['tid'].",";
+                    }   
+                }
             }
 
             if(!empty($sceneTIDs)) {
@@ -4482,9 +4486,10 @@ function playerdirectory_misc(){
             // Inplaytracker von Ales
             else if ($inplaytrackersystem == 4) {
                 $sceneTIDs = "";
+                $scene_username = get_user($charaID)['username'];
                 // Szenen des Users auslesen - TID
                 $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
-                WHERE (concat(',',spieler,',') LIKE '%,".$charaID.",%')
+                WHERE (concat(',',spieler,',') LIKE '%,".$scene_username.",%')
                 ORDER by tid ASC                
                 ");     
 
@@ -4629,16 +4634,19 @@ function playerdirectory_misc(){
         // Inplaytracker von Ales
         else if ($inplaytrackersystem == 4) {
             $sceneTIDs = "";
-            // Szenen des Users auslesen - TID
-            $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
-            WHERE (concat(',',spieler,',') LIKE '%,".$charaID.",%')
-            ORDER by tid ASC                
-            ");     
+            foreach ($userids_array as $userID) {
+                $scene_username = get_user($userID)['username'];
+                // Szenen des Users auslesen - TID
+                $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
+                WHERE (concat(',',spieler,',') LIKE '%,".$scene_username.",%')
+                ORDER by tid ASC
+                ");     
 
-            while ($allcharscenes = $db->fetch_array($query_allcharscenes)){
-                // Mit Infos füllen
-                $sceneTIDs .= $allcharscenes['tid'].",";
-            } 
+                while ($allcharscenes = $db->fetch_array($query_allcharscenes)){
+                    // Mit Infos füllen
+                    $sceneTIDs .= $allcharscenes['tid'].",";
+                }   
+            }
         }
 
         if(!empty($sceneTIDs)) {
@@ -5843,12 +5851,12 @@ function playerdirectory_misc(){
         // Inplaytracker von Ales
         else if ($inplaytrackersystem == 4) {
             $sceneTIDs = "";
+            $scene_username = get_user($charaID)['username'];
             // Szenen des Users auslesen - TID
             $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
-            WHERE (concat(',',spieler,',') LIKE '%,".$charaID.",%')
+            WHERE (concat(',',spieler,',') LIKE '%,".$scene_username.",%')
             ORDER by tid ASC                
             ");     
-
             while ($allcharscenes = $db->fetch_array($query_allcharscenes)){
                 // Mit Infos füllen
                 $sceneTIDs .= $allcharscenes['tid'].",";
