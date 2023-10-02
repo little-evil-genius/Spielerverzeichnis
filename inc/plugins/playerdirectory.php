@@ -3647,7 +3647,7 @@ function playerdirectory_misc(){
                     $sceneTIDs = "";
                     // Szenen des Users auslesen - TID
                     $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
-                    WHERE (concat(',',partners,',') LIKE '%,".$charaID.",%')
+                    WHERE (concat(',',spieler,',') LIKE '%,".$charaID.",%')
                     ORDER by tid ASC                
                     ");     
     
@@ -3982,7 +3982,7 @@ function playerdirectory_misc(){
                 $sceneTIDs = "";
                 // Szenen des Users auslesen - TID
                 $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
-                WHERE (concat(',',partners,',') LIKE '%,".$charaID.",%')
+                WHERE (concat(',',spieler,',') LIKE '%,".$charaID.",%')
                 ORDER by tid ASC                
                 ");     
 
@@ -4484,7 +4484,7 @@ function playerdirectory_misc(){
                 $sceneTIDs = "";
                 // Szenen des Users auslesen - TID
                 $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
-                WHERE (concat(',',partners,',') LIKE '%,".$charaID.",%')
+                WHERE (concat(',',spieler,',') LIKE '%,".$charaID.",%')
                 ORDER by tid ASC                
                 ");     
 
@@ -4631,7 +4631,7 @@ function playerdirectory_misc(){
             $sceneTIDs = "";
             // Szenen des Users auslesen - TID
             $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
-            WHERE (concat(',',partners,',') LIKE '%,".$charaID.",%')
+            WHERE (concat(',',spieler,',') LIKE '%,".$charaID.",%')
             ORDER by tid ASC                
             ");     
 
@@ -5845,7 +5845,7 @@ function playerdirectory_misc(){
             $sceneTIDs = "";
             // Szenen des Users auslesen - TID
             $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
-            WHERE (concat(',',partners,',') LIKE '%,".$charaID.",%')
+            WHERE (concat(',',spieler,',') LIKE '%,".$charaID.",%')
             ORDER by tid ASC                
             ");     
 
