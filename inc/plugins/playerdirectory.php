@@ -218,7 +218,7 @@ function playerdirectory_install(){
 		'playerdirectory_inplaytracker' => array(
 			'title' => $lang->playerdirectory_setting_inplaytracker,
 			'description' => $lang->playerdirectory_setting_inplaytracker_desc,
-			'optionscode' => 'select\n0='.$lang->playerdirectory_setting_inplaytracker_jule2.'\n1='.$lang->playerdirectory_setting_inplaytracker_jule3.'\n2='.$lang->playerdirectory_setting_inplaytracker_katja.'\n3='.$lang->playerdirectory_setting_inplaytracker_lara,
+			'optionscode' => 'select\n0='.$lang->playerdirectory_setting_inplaytracker_jule2.'\n1='.$lang->playerdirectory_setting_inplaytracker_jule3.'\n2='.$lang->playerdirectory_setting_inplaytracker_katja.'\n3='.$lang->playerdirectory_setting_inplaytracker_lara.'\n4='.$lang->playerdirectory_setting_inplaytracker_ales,
 			'value' => '1', // Default
 			'disporder' => 17
 		),
@@ -3642,6 +3642,20 @@ function playerdirectory_misc(){
                         $sceneTIDs .= $allcharscenes['tid'].",";
                     }
                 }
+                // Inplaytracker von Ales
+                else if ($inplaytrackersystem == 4) {
+                    $sceneTIDs = "";
+                    // Szenen des Users auslesen - TID
+                    $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
+                    WHERE (concat(',',partners,',') LIKE '%,".$charaID.",%')
+                    ORDER by tid ASC                
+                    ");     
+    
+                    while ($allcharscenes = $db->fetch_array($query_allcharscenes)){
+                        // Mit Infos füllen
+                        $sceneTIDs .= $allcharscenes['tid'].",";
+                    } 
+                }
 
                 if(!empty($sceneTIDs)) {
                     // letztes Komma abschneiden 
@@ -3963,6 +3977,20 @@ function playerdirectory_misc(){
                     }    
                 }
             } 
+            // Inplaytracker von Ales
+            else if ($inplaytrackersystem == 4) {
+                $sceneTIDs = "";
+                // Szenen des Users auslesen - TID
+                $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
+                WHERE (concat(',',partners,',') LIKE '%,".$charaID.",%')
+                ORDER by tid ASC                
+                ");     
+
+                while ($allcharscenes = $db->fetch_array($query_allcharscenes)){
+                    // Mit Infos füllen
+                    $sceneTIDs .= $allcharscenes['tid'].",";
+                } 
+            }
 
             if(!empty($sceneTIDs)) {
                 // letztes Komma abschneiden 
@@ -4451,6 +4479,20 @@ function playerdirectory_misc(){
                     $sceneTIDs .= $allcharscenes['tid'].",";
                 }
             }
+            // Inplaytracker von Ales
+            else if ($inplaytrackersystem == 4) {
+                $sceneTIDs = "";
+                // Szenen des Users auslesen - TID
+                $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
+                WHERE (concat(',',partners,',') LIKE '%,".$charaID.",%')
+                ORDER by tid ASC                
+                ");     
+
+                while ($allcharscenes = $db->fetch_array($query_allcharscenes)){
+                    // Mit Infos füllen
+                    $sceneTIDs .= $allcharscenes['tid'].",";
+                } 
+            }
 
             if(!empty($sceneTIDs)) {
                 // letztes Komma abschneiden 
@@ -4584,6 +4626,20 @@ function playerdirectory_misc(){
                 }    
             }
         } 
+        // Inplaytracker von Ales
+        else if ($inplaytrackersystem == 4) {
+            $sceneTIDs = "";
+            // Szenen des Users auslesen - TID
+            $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
+            WHERE (concat(',',partners,',') LIKE '%,".$charaID.",%')
+            ORDER by tid ASC                
+            ");     
+
+            while ($allcharscenes = $db->fetch_array($query_allcharscenes)){
+                // Mit Infos füllen
+                $sceneTIDs .= $allcharscenes['tid'].",";
+            } 
+        }
 
         if(!empty($sceneTIDs)) {
             // letztes Komma abschneiden 
@@ -5783,6 +5839,20 @@ function playerdirectory_misc(){
                 // Mit Infos füllen
                 $sceneTIDs .= $allcharscenes['tid'].",";
             }        
+        }
+        // Inplaytracker von Ales
+        else if ($inplaytrackersystem == 4) {
+            $sceneTIDs = "";
+            // Szenen des Users auslesen - TID
+            $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
+            WHERE (concat(',',partners,',') LIKE '%,".$charaID.",%')
+            ORDER by tid ASC                
+            ");     
+
+            while ($allcharscenes = $db->fetch_array($query_allcharscenes)){
+                // Mit Infos füllen
+                $sceneTIDs .= $allcharscenes['tid'].",";
+            } 
         }
 
         if(!empty($sceneTIDs)) {
