@@ -3645,6 +3645,7 @@ function playerdirectory_misc(){
                 // Inplaytracker von Ales
                 else if ($inplaytrackersystem == 4) {
                     $sceneTIDs = "";
+                    $scene_username = "";
                     $scene_username = get_user($characterID)['username'];
                     // Szenen des Users auslesen - TID
                     $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
@@ -3981,6 +3982,7 @@ function playerdirectory_misc(){
             // Inplaytracker von Ales
             else if ($inplaytrackersystem == 4) {
                 $sceneTIDs = "";
+                $scene_username = "";
                 foreach ($userids_array as $userID) {
                     $scene_username = get_user($userID)['username'];
                     // Szenen des Users auslesen - TID
@@ -4486,6 +4488,7 @@ function playerdirectory_misc(){
             // Inplaytracker von Ales
             else if ($inplaytrackersystem == 4) {
                 $sceneTIDs = "";
+                $scene_username = "";
                 $scene_username = get_user($charaID)['username'];
                 // Szenen des Users auslesen - TID
                 $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
@@ -4634,6 +4637,7 @@ function playerdirectory_misc(){
         // Inplaytracker von Ales
         else if ($inplaytrackersystem == 4) {
             $sceneTIDs = "";
+            $scene_username = "";
             foreach ($userids_array as $userID) {
                 $scene_username = get_user($userID)['username'];
                 // Szenen des Users auslesen - TID
@@ -5851,6 +5855,7 @@ function playerdirectory_misc(){
         // Inplaytracker von Ales
         else if ($inplaytrackersystem == 4) {
             $sceneTIDs = "";
+            $scene_username = "";
             $scene_username = get_user($charaID)['username'];
             // Szenen des Users auslesen - TID
             $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
