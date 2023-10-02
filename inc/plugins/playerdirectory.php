@@ -3687,7 +3687,25 @@ function playerdirectory_misc(){
                         // klassisches Profilfeld
                         if (is_numeric($birthday_field)) {
                             if(!empty($character[$birthday_fid])) {
-                                $birthday = new DateTime($character[$birthday_fid]);
+
+                                // Geburstag aufsplitten
+                                $birthday_array = explode(".", $character[$birthday_fid]);
+
+                                // Jahr überprüfen, ob 4 Ziffern
+                                if (strlen($birthday_array[2]) < 4) {
+                                    
+                                    $null = "";
+                                    for ($i = strlen($birthday_array[2]); $i <= 3; $i++) {
+                                        $null .= "0";
+                                    }
+	
+                                    $birthyear = $null.$birthday_array[2];
+
+                                } else {
+                                    $birthyear = $birthday_array[2];
+                                }
+
+                                $birthday = new DateTime($birthday_array[0].".".$birthday_array[1].".".$birthyear);
                                 $interval = $ingame->diff($birthday);
                                 $age = $interval->format("%Y");
                             } else {
@@ -3697,7 +3715,55 @@ function playerdirectory_misc(){
                         // Steckbrief Plugin
                         else {
                             if(!empty($character[$birthday_field])) {
-                                $birthday = new DateTime($character[$birthday_field]);
+
+                                $field_type = $db->fetch_field($db->simple_select("application_ucp_fields", "fieldtyp" ,"fieldname = ".$birthday_field.""), "fieldtyp");
+
+                                // Datum -
+                                if ($field_type == "date") {
+                                    // Geburstag aufsplitten
+                                    $birthday_array = explode("-", $character[$birthday_field]);
+
+                                    $birth_day = $birthday_array[2];
+                                    $birth_month = $birthday_array[1];
+                                    $birth_year = $birthday_array[0];
+                                } 
+                                // Datum und Zeit T & -
+                                else if ($field_type == "datetime-local") {
+                                    // Geburstag aufsplitten
+                                    $birthday_time = explode("T", $character[$birthday_field]);
+                                    $birthday_array = explode("-", $birthday_time[0]);
+
+                                    $birth_day = $birthday_array[2];
+                                    $birth_month = $birthday_array[1];
+                                    $birth_year = $birthday_array[0];
+
+                                } 
+                                // Text .
+                                else {
+                                    // Geburstag aufsplitten
+                                    $birthday_array = explode(".", $character[$birthday_field]);
+
+                                    $birth_day = $birthday_array[0];
+                                    $birth_month = $birthday_array[1];
+                                    $birth_year = $birthday_array[2];
+                                }
+
+                                // Jahr überprüfen, ob 4 Ziffern
+                                if (strlen($birth_year) < 4) {
+                                    
+                                    $null = "";
+                                    for ($i = strlen($birth_year); $i <= 3; $i++) {
+                                        $null .= "0";
+                                    }
+	
+                                    $birthyear = $null.$birth_year;
+
+                                } else {
+                                    $birthyear = $birth_year;
+                                }
+
+
+                                $birthday = new DateTime($birth_day.".".$birth_month.".".$birthyear);
                                 $interval = $ingame->diff($birthday);
                                 $age = $interval->format("%Y");
                             } else {
@@ -3708,7 +3774,30 @@ function playerdirectory_misc(){
                     // MyBB Geburtstagsfeld
                     else {
                         if(!empty($character['birthday'])) {
-                            $birthday = new DateTime($character['birthday']);
+
+                            // Geburstag aufsplitten
+                            $birthday_array = explode("-", $character['birthday']);
+
+                            $birth_day = $birthday_array[0];
+                            $birth_month = $birthday_array[1];
+                            $birth_year = $birthday_array[2];
+
+                            // Jahr überprüfen, ob 4 Ziffern
+                            if (strlen($birth_year) < 4) {
+                                
+                                $null = "";
+                                for ($i = strlen($birth_year); $i <= 3; $i++) {
+                                    $null .= "0";
+                                }
+
+                                $birthyear = $null.$birth_year;
+
+                            } else {
+                                $birthyear = $birth_year;
+                            }
+
+
+                            $birthday = new DateTime($birth_day.".".$birth_month.".".$birthyear);
                             $interval = $ingame->diff($birthday);
                             $age = $interval->format("%Y");
                         } else {
