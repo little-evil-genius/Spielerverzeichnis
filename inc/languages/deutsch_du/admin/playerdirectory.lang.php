@@ -50,6 +50,7 @@ $l['playerdirectory_setting_inplaytracker_jule2'] = "Inplaytracker 2.0 von spark
 $l['playerdirectory_setting_inplaytracker_jule3'] = "Inplaytracker 3.0 von sparks fly";
 $l['playerdirectory_setting_inplaytracker_katja'] = "Szenentracker von risuena";
 $l['playerdirectory_setting_inplaytracker_lara'] = "Inplaytracker von little.evil.genius";
+$l['playerdirectory_setting_inplaytracker_ales'] = "Inplaytracker von Ales";
 $l['playerdirectory_setting_inplaystat'] = "letzte 12 Monate-Statistik";
 $l['playerdirectory_setting_inplaystat_desc'] = "Soll eine Inplaypost-Statistik der die letzten 12 Monate für jeden User und Charakter angezeigt werden?";
 $l['playerdirectory_setting_inplaystat_none'] = "keine Statistik";
