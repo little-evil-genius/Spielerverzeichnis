@@ -3649,7 +3649,7 @@ function playerdirectory_misc(){
                     $scene_username = get_user($characterID)['username'];
                     // Szenen des Users auslesen - TID
                     $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
-                    WHERE (concat(',',spieler,',') LIKE '%,".$scene_username.",%')
+                    WHERE (concat(', ',spieler,',') LIKE '%, ".$scene_username.",%')
                     ORDER by tid ASC                
                     ");     
     
@@ -3987,7 +3987,7 @@ function playerdirectory_misc(){
                     $scene_username = get_user($userID)['username'];
                     // Szenen des Users auslesen - TID
                     $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
-                    WHERE (concat(',',spieler,',') LIKE '%,".$scene_username.",%')
+                    WHERE (concat(', ',spieler,',') LIKE '%, ".$scene_username.",%')
                     ORDER by tid ASC    
                     ");     
 
@@ -4492,7 +4492,7 @@ function playerdirectory_misc(){
                 $scene_username = get_user($charaID)['username'];
                 // Szenen des Users auslesen - TID
                 $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
-                WHERE (concat(',',spieler,',') LIKE '%,".$scene_username.",%')
+                WHERE (concat(', ',spieler,',') LIKE '%, ".$scene_username.",%')
                 ORDER by tid ASC                
                 ");     
 
@@ -4642,7 +4642,7 @@ function playerdirectory_misc(){
                 $scene_username = get_user($userID)['username'];
                 // Szenen des Users auslesen - TID
                 $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
-                WHERE (concat(',',spieler,',') LIKE '%,".$scene_username.",%')
+                WHERE (concat(', ',spieler,',') LIKE '%, ".$scene_username.",%')
                 ORDER by tid ASC
                 ");     
 
@@ -5859,7 +5859,7 @@ function playerdirectory_misc(){
             $scene_username = get_user($charaID)['username'];
             // Szenen des Users auslesen - TID
             $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
-            WHERE (concat(',',spieler,',') LIKE '%,".$scene_username.",%')
+            WHERE (concat(', ',spieler,',') LIKE '%, ".$scene_username.",%')
             ORDER by tid ASC                
             ");     
             while ($allcharscenes = $db->fetch_array($query_allcharscenes)){
