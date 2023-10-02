@@ -6,7 +6,7 @@ Wem dieses Plugin zu komplex und umfangreich ist, hat die Möglichkeit das [Wer 
 <br>
 <b>HINWEIS:</b><br>
 Das Plugin ist kompatibel mit den klassischen Profilfeldern von MyBB und/oder dem <a href="https://github.com/katjalennartz/application_ucp">Steckbrief-Plugin von Risuena</a>.<br>
-Auch ist das Plugin mit verschiedenen Inplaytrackern/Szenentrackern kompatibel: mit dem <a href="https://github.com/its-sparks-fly/Inplaytracker-2.0">Inplaytracker 2.0 von sparks fly</a>, dem Nachfolger <a href="https://github.com/ItsSparksFly/mybb-inplaytracker">Inplaytracker 3.0 von sparks fly</a> und dem <a href="https://github.com/katjalennartz/scenetracker">Szenentracker von Risuena</a>.<br>
+Auch ist das Plugin mit verschiedenen Inplaytrackern/Szenentrackern kompatibel: mit dem <a href="https://github.com/its-sparks-fly/Inplaytracker-2.0">Inplaytracker 2.0 von sparks fly</a>, dem Nachfolger <a href="https://github.com/ItsSparksFly/mybb-inplaytracker">Inplaytracker 3.0 von sparks fly</a>, dem <a href="https://github.com/katjalennartz/scenetracker">Szenentracker von Risuena</a> und dem <a href="https://github.com/Ales12/inplaytracker">Inplaytracker von Ales</a>.<br>
 Genauso kann auch das Listen-Menü angezeigt werden, wenn man das <a href="https://github.com/ItsSparksFly/mybb-lists">Automatische Listen-Plugin von sparks fly</a> verwendet. Beides muss nur vorher eingestellt werden.
 
 # Vorrausetzung
