@@ -3672,7 +3672,7 @@ function playerdirectory_misc(){
                 // Anzahl Inplay-Posts
                 $count_allinplayposts = $db->num_rows($db->query("SELECT pid FROM ".TABLE_PREFIX."posts p
                 WHERE p.uid = '".$characterID."'
-                AND p.tid IN ($sceneTIDs_string)
+                AND p.tid IN (".$sceneTIDs_string.")
                 AND p.visible = '1'
                 "));
         
@@ -4010,8 +4010,8 @@ function playerdirectory_misc(){
 
             // Anzahl Inplay-Posts
             $count_allinplayposts = $db->num_rows($db->query("SELECT pid FROM ".TABLE_PREFIX."posts p
-            WHERE p.uid IN ($userids_string)
-            AND p.tid IN ($sceneTIDs_string)
+            WHERE p.uid IN (".$userids_string.")
+            AND p.tid IN (".$sceneTIDs_string.")
             AND p.visible = '1'
             "));
     
@@ -4183,7 +4183,7 @@ function playerdirectory_misc(){
 		/* CHARAKTERE AUSLESEN */
 		$allcharacters_query = $db->query("SELECT * FROM ".TABLE_PREFIX."users u
 		".$query_join."
-		WHERE (u.uid = '$mainID' OR u.as_uid = '$mainID')
+		WHERE (u.uid = '".$mainID."' OR u.as_uid = '".$mainID."')
 		ORDER BY u.username ASC
 		");
 
@@ -4515,7 +4515,7 @@ function playerdirectory_misc(){
             // Anzahl Inplay-Posts
             $count_allinplayposts = $db->num_rows($db->query("SELECT pid FROM ".TABLE_PREFIX."posts p
             WHERE p.uid = '".$charaID."'
-            AND p.tid IN ($sceneTIDs_string)
+            AND p.tid IN (".$sceneTIDs_string.")
             AND p.visible = '1'
             "));
     
@@ -4736,8 +4736,8 @@ function playerdirectory_misc(){
         
         // Letzter Inplaybeitrag
 		$query_lastinplaypost = $db->query("SELECT * FROM ".TABLE_PREFIX."posts p
-		WHERE p.uid IN ($userids_string)
-		AND p.tid IN ($sceneTIDs_string)
+		WHERE p.uid IN (".$userids_string.")
+		AND p.tid IN (".$sceneTIDs_string.")
         AND p.visible = '1'
 		ORDER by p.dateline DESC
 		LIMIT 1
@@ -4776,8 +4776,8 @@ function playerdirectory_misc(){
 
         // Anzahl Inplay-Posts
         $count_allinplayposts = $db->num_rows($db->query("SELECT pid FROM ".TABLE_PREFIX."posts p
-		WHERE p.uid IN ($userids_string)
-		AND p.tid IN ($sceneTIDs_string)
+		WHERE p.uid IN (".$userids_string.")
+		AND p.tid IN (".$sceneTIDs_string.")
         AND p.visible = '1'
 		"));
 
@@ -4806,7 +4806,7 @@ function playerdirectory_misc(){
 
             // heißeste Szene
             $query_hotscene = $db->query("SELECT * FROM ".TABLE_PREFIX."threads
-            WHERE tid IN ($sceneTIDs_string)
+            WHERE tid IN (".$sceneTIDs_string.")
             ORDER by replies DESC
             LIMIT 1
             ");
@@ -4836,7 +4836,7 @@ function playerdirectory_misc(){
 
             // interessanteste Szene
             $query_viewscene = $db->query("SELECT * FROM ".TABLE_PREFIX."threads
-            WHERE tid IN ($sceneTIDs_string)
+            WHERE tid IN (".$sceneTIDs_string.")
             ORDER by views DESC
             LIMIT 1
             ");
@@ -4869,8 +4869,8 @@ function playerdirectory_misc(){
         
         // WÖRTER & ZEICHEN
         $query_allinplaypost = $db->query("SELECT * FROM ".TABLE_PREFIX."posts p
-		WHERE p.uid IN ($userids_string)
-		AND p.tid IN ($sceneTIDs_string)
+		WHERE p.uid IN (".$userids_string.")
+		AND p.tid IN (".$sceneTIDs_string.")
         AND p.visible = '1'
 		");
 
@@ -4916,7 +4916,7 @@ function playerdirectory_misc(){
         /* CHARAKTER-STATISTIKEN */
         // erster Charakter
         $query_firstchara = $db->query("SELECT * FROM ".TABLE_PREFIX."users p
-		WHERE uid IN ($userids_string)
+		WHERE uid IN (".$userids_string.")
 		ORDER by regdate ASC
 		LIMIT 1
 		");
@@ -4952,7 +4952,7 @@ function playerdirectory_misc(){
 
         // neuster Charakter
         $query_lastchara = $db->query("SELECT * FROM ".TABLE_PREFIX."users p
-		WHERE uid IN ($userids_string)
+		WHERE uid IN (".$userids_string.")
 		ORDER by regdate DESC
 		LIMIT 1
 		");
@@ -4988,8 +4988,8 @@ function playerdirectory_misc(){
 
         // Heißester Charakter
         $query_hotuser = $db->query("SELECT * FROM ".TABLE_PREFIX."posts p
-		WHERE uid in ($userids_string)
-		AND tid IN ($sceneTIDs_string)
+		WHERE uid in (".$userids_string.")
+		AND tid IN (".$sceneTIDs_string.")
         AND p.visible = '1'
 		"); 
 
@@ -5005,8 +5005,8 @@ function playerdirectory_misc(){
 			$uid = $hotU['uid'];
 			$charactername = $db->fetch_field($db->simple_select("users","username","uid = ".$uid.""), "username");
 			$count_inplayposts =  $db->num_rows($db->query("SELECT pid FROM ".TABLE_PREFIX."posts p
-			WHERE p.uid = $uid
-			AND p.tid IN ($sceneTIDs_string)
+			WHERE p.uid = ".$uid."
+			AND p.tid IN (".$sceneTIDs_string.")
             AND p.visible = '1'
 			"));
 
@@ -5037,8 +5037,8 @@ function playerdirectory_misc(){
             $hotCharactername_formated = build_profile_link(format_name($hotusername, $hotusergroup, $displaygroup), $hotUID);	
 
 			$count_hotinplayposts = $db->num_rows($db->query("SELECT pid FROM ".TABLE_PREFIX."posts p
-			WHERE p.uid = $hotUID
-			AND p.tid IN ($sceneTIDs_string)
+			WHERE p.uid = ".$hotUID."
+			AND p.tid IN (".$sceneTIDs_string.")
             AND p.visible = '1'
 			"));
 
@@ -5054,7 +5054,7 @@ function playerdirectory_misc(){
             $age_fid = "";
             if (is_numeric($birthday_field)) {
                 $query_birthdays = $db->query("SELECT * FROM ".TABLE_PREFIX."userfields
-                WHERE ufid in ($userids_string)
+                WHERE ufid in (".$userids_string.")
                 AND ".$birthday_fid." != ''
                 ");
 
@@ -5083,7 +5083,7 @@ function playerdirectory_misc(){
                 } 
             } else {
                 $query_birthdays = $db->query("SELECT * FROM ".TABLE_PREFIX."application_ucp_userfields
-                WHERE uid in ($userids_string)
+                WHERE uid in (".$userids_string.")
                 AND fieldid = '".$birthday_fid."'
                 AND value != ''
                 ");
@@ -5145,7 +5145,7 @@ function playerdirectory_misc(){
         // MyBB-Geburtstagsfeld
         else if ($birthday_option == 1) {
             $query_birthdays = $db->query("SELECT * FROM ".TABLE_PREFIX."users u
-            WHERE uid in ($userids_string)
+            WHERE uid in (".$userids_string.")
             AND birthday != ''
             "); 
 
@@ -5181,7 +5181,7 @@ function playerdirectory_misc(){
         else if ($birthday_option == 2) {
             if (is_numeric($age_field)) {
                 $query_birthdays = $db->query("SELECT * FROM ".TABLE_PREFIX."userfields
-                WHERE ufid in ($userids_string)
+                WHERE ufid in (".$userids_string.")
                 AND ".$age_fid." != ''
                 ");
 
@@ -5198,7 +5198,7 @@ function playerdirectory_misc(){
                 } 
             } else {
                 $query_birthdays = $db->query("SELECT * FROM ".TABLE_PREFIX."application_ucp_userfields
-                WHERE uid in ($userids_string)
+                WHERE uid in (".$userids_string.")
                 AND fieldid = '".$age_fid."'
                 AND value != ''
                 ");
@@ -5276,8 +5276,8 @@ function playerdirectory_misc(){
             $query_hotcharascene = $db->query("SELECT * FROM ".TABLE_PREFIX."threads t
             LEFT JOIN ".TABLE_PREFIX."posts p
             ON t.tid = p.tid
-            WHERE t.tid IN ($sceneTIDs_string)
-            AND p.uid IN ($userids_string)
+            WHERE t.tid IN (".$sceneTIDs_string.")
+            AND p.uid IN (".$userids_string.")
             AND p.visible = '1'
             ORDER by replies DESC
             LIMIT 1
@@ -5298,7 +5298,7 @@ function playerdirectory_misc(){
 				$pid = $hotchara['firstpost'];
 
                 $count_hotscenePosts = $db->num_rows($db->query("SELECT pid FROM ".TABLE_PREFIX."posts p
-                WHERE p.uid IN ($userids_string)
+                WHERE p.uid IN (".$userids_string.")
                 AND p.tid = '".$tid."'
                 AND p.visible = '1'
                 "));
@@ -5324,7 +5324,7 @@ function playerdirectory_misc(){
             LEFT JOIN ".TABLE_PREFIX."users u 
             ON u.uid = ipq.uid
             ".$query_join."
-            WHERE ipq.uid IN ($userids_string)
+            WHERE ipq.uid IN (".$userids_string.")
             ORDER BY rand()
             "); 
 
@@ -5434,8 +5434,8 @@ function playerdirectory_misc(){
                 $enddate_setting = strtotime($enddate_setting. " 23:59:59");
     
                 $count_allmonthposts = $db->num_rows($db->query("SELECT pid FROM ".TABLE_PREFIX."posts p
-                WHERE p.uid IN ($userids_string)
-                AND p.tid IN ($sceneTIDs_string)
+                WHERE p.uid IN (".$userids_string.")
+                AND p.tid IN (".$sceneTIDs_string.")
                 AND p.dateline BETWEEN '".$startdate_setting."' AND '".$enddate_setting."'
                 AND p.visible = '1'
                 "));
@@ -5638,7 +5638,7 @@ function playerdirectory_misc(){
         // {$playerstat['XXX']}
         $playerstat_query = $db->query("SELECT * FROM ".TABLE_PREFIX."users u
 		".$query_join."
-		WHERE u.uid = '$mainID'
+		WHERE u.uid = '".$mainID."'
         ");
         $playerstat = $db->fetch_array($playerstat_query);
 
@@ -6090,7 +6090,7 @@ function playerdirectory_misc(){
         // Letzter Inplaybeitrag
 		$query_lastinplaypost = $db->query("SELECT * FROM ".TABLE_PREFIX."posts p
 		WHERE p.uid = '".$charaID."'
-		AND p.tid IN ($sceneTIDs_string)
+		AND p.tid IN (".$sceneTIDs_string.")
         AND p.visible = '1'
 		ORDER by p.dateline DESC
 		LIMIT 1
@@ -6130,7 +6130,7 @@ function playerdirectory_misc(){
         // Anzahl Inplay-Posts
         $count_allinplayposts = $db->num_rows($db->query("SELECT pid FROM ".TABLE_PREFIX."posts p
 		WHERE p.uid = '".$charaID."'
-		AND p.tid IN ($sceneTIDs_string)
+		AND p.tid IN (".$sceneTIDs_string.")
         AND p.visible = '1'
 		"));
 
@@ -6159,7 +6159,7 @@ function playerdirectory_misc(){
 
             // heißeste Szene
             $query_hotscene = $db->query("SELECT * FROM ".TABLE_PREFIX."threads
-            WHERE tid IN ($sceneTIDs_string)
+            WHERE tid IN (".$sceneTIDs_string.")
             ORDER by replies DESC
             LIMIT 1
             ");
@@ -6189,7 +6189,7 @@ function playerdirectory_misc(){
 
             // interessanteste Szene
             $query_viewscene = $db->query("SELECT * FROM ".TABLE_PREFIX."threads
-            WHERE tid IN ($sceneTIDs_string)
+            WHERE tid IN (".$sceneTIDs_string.")
             ORDER by views DESC
             LIMIT 1
             ");
@@ -6223,7 +6223,7 @@ function playerdirectory_misc(){
         // WÖRTER & ZEICHEN
         $query_allinplaypost = $db->query("SELECT * FROM ".TABLE_PREFIX."posts p
 		WHERE p.uid = '".$charaID."'
-		AND p.tid IN ($sceneTIDs_string)
+		AND p.tid IN (".$sceneTIDs_string.")
         AND p.visible = '1'
 		");
 
@@ -6384,7 +6384,7 @@ function playerdirectory_misc(){
     
                 $count_allmonthposts = $db->num_rows($db->query("SELECT pid FROM ".TABLE_PREFIX."posts p
                 WHERE p.uid = '".$charaID."'
-                AND p.tid IN ($sceneTIDs_string)
+                AND p.tid IN (".$sceneTIDs_string.")
                 AND p.dateline BETWEEN '".$startdate_setting."' AND '".$enddate_setting."'
                 AND p.visible = '1'
                 "));
