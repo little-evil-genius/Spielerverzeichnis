@@ -3732,7 +3732,7 @@ function playerdirectory_misc(){
                         else {
                             if(!empty($character[$birthday_field])) {
 
-                                $field_type = $db->fetch_field($db->simple_select("application_ucp_fields", "fieldtyp" ,"fieldname = ".$birthday_field.""), "fieldtyp");
+                                $field_type = $db->fetch_field($db->simple_select("application_ucp_fields", "fieldtyp" ,"fieldname = '".$birthday_field."'"), "fieldtyp");
 
                                 // Datum -
                                 if ($field_type == "date") {
@@ -4292,7 +4292,7 @@ function playerdirectory_misc(){
                     else {
                         if(!empty($char[$birthday_field])) {
 
-                            $field_type = $db->fetch_field($db->simple_select("application_ucp_fields", "fieldtyp" ,"fieldname = ".$birthday_field.""), "fieldtyp");
+                            $field_type = $db->fetch_field($db->simple_select("application_ucp_fields", "fieldtyp" ,"fieldname = '".$birthday_field."'"), "fieldtyp");
 
                             // Datum -
                             if ($field_type == "date") {
@@ -5948,7 +5948,7 @@ function playerdirectory_misc(){
                 else {
                     if(!empty($characterstat[$birthday_field])) {
 
-                        $field_type = $db->fetch_field($db->simple_select("application_ucp_fields", "fieldtyp" ,"fieldname = ".$birthday_field.""), "fieldtyp");
+                        $field_type = $db->fetch_field($db->simple_select("application_ucp_fields", "fieldtyp" ,"fieldname = '".$birthday_field."'"), "fieldtyp");
 
                         // Datum -
                         if ($field_type == "date") {
