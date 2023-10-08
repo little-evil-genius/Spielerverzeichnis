@@ -752,7 +752,8 @@ function playerdirectory_install(){
                             display: false
                         },
                         ticks: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            fontColor: text
                         }
                     }]
                 }
@@ -921,7 +922,8 @@ function playerdirectory_install(){
                             display: false
                         },
                         ticks: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            fontColor: text
                         }
                     }]
                 }
@@ -1039,7 +1041,8 @@ function playerdirectory_install(){
                         display: false
                     },
                     ticks: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        fontColor: text
                     }
                 }]
             }
@@ -1195,7 +1198,8 @@ function playerdirectory_install(){
                         display: false
                     },
                     ticks: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        fontColor: text
                     }
                 }]
             }
