@@ -3827,8 +3827,7 @@ function playerdirectory_misc(){
                     if (is_numeric($age_field)) {
                         if(!empty($character[$age_fid])) {
                             // Feld = X Jahre => Jahre rauswerfen
-                            $only_age = $character[$age_fid];
-                            $only_age = preg_replace('/[^0-9]/', '', $only_age);
+                            $only_age = preg_replace('/[^0-9]/', '', $character[$age_fid]);
                             $age = $only_age;
                         } else {
                             $age = "00";
@@ -3838,8 +3837,7 @@ function playerdirectory_misc(){
                     else {
                         if(!empty($character[$age_field])) {
                             // Feld = X Jahre => Jahre rauswerfen
-                            $only_age = $character[$age_fid];
-                            $only_age = preg_replace('/[^0-9]/', '', $only_age);
+                            $only_age = preg_replace('/[^0-9]/', '', $character[$age_field]);
                             $age = $only_age;
                         } else {
                             $age = "00";
@@ -4386,8 +4384,7 @@ function playerdirectory_misc(){
                 if (is_numeric($age_field)) {
                     if(!empty($char[$age_fid])) {
                         // Feld = X Jahre => Jahre rauswerfen
-                        $only_age = $char[$age_field];
-                        $only_age = preg_replace('/[^0-9]/', '', $only_age);
+                        $only_age = preg_replace('/[^0-9]/', '', $char[$age_fid]);
                         $age = $only_age;
                     } else {
                         $age = "00";
@@ -4397,8 +4394,7 @@ function playerdirectory_misc(){
                 else {
                     if(!empty($char[$age_field])) {
                         // Feld = X Jahre => Jahre rauswerfen
-                        $only_age = $char[$age_field];
-                        $only_age = preg_replace('/[^0-9]/', '', $only_age);
+                        $only_age = preg_replace('/[^0-9]/', '', $char[$age_field]);
                         $age = $only_age;
                     } else {
                         $age = "00";
@@ -5190,8 +5186,7 @@ function playerdirectory_misc(){
                     $username = get_user($bdays['ufid'])['username'];
                     
                     // Feld = X Jahre => Jahre rauswerfen
-                    $only_age = $bdays['fid'.$age_field];
-                    $only_age = preg_replace('/[^0-9]/', '', $only_age);
+                    $only_age = preg_replace('/[^0-9]/', '', $bdays['fid'.$age_field]);
                     $age = $only_age;
 
                     $bday_array[$username] = $age;
@@ -5208,8 +5203,7 @@ function playerdirectory_misc(){
                     $username = get_user($bdays['uid'])['username'];
                     
                     // Feld = X Jahre => Jahre rauswerfen
-                    $only_age = $bdays[$age_field];
-                    $only_age = preg_replace('/[^0-9]/', '', $only_age);
+                    $only_age = preg_replace('/[^0-9]/', '', $bdays[$age_field]);
                     $age = $only_age;
 
                     $bday_array[$username] = $age;
@@ -6043,8 +6037,7 @@ function playerdirectory_misc(){
             if (is_numeric($age_field)) {
                 if(!empty($characterstat[$age_fid])) {
                     // Feld = X Jahre => Jahre rauswerfen
-                    $only_age = $characterstat[$age_fid];
-                    $only_age = preg_replace('/[^0-9]/', '', $only_age);
+                    $only_age = preg_replace('/[^0-9]/', '', $characterstat[$age_fid]);
                     $age = $only_age;
                 } else {
                     $age = "00";
@@ -6054,8 +6047,7 @@ function playerdirectory_misc(){
             else {
                 if(!empty($characterstat[$age_field])) {
                     // Feld = X Jahre => Jahre rauswerfen
-                    $only_age = $characterstat[$age_field];
-                    $only_age = preg_replace('/[^0-9]/', '', $only_age);
+                    $only_age = preg_replace('/[^0-9]/', '', $characterstat[$age_field]);
                     $age = $only_age;
                 } else {
                     $age = "00";
