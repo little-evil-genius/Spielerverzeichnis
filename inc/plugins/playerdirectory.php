@@ -6759,7 +6759,7 @@ function playerdirectory_build_statistics($userids_string){
                     $data_options = [];
                     foreach ($expoptions as $option) {
 
-                        if ($fieldtyp != "multiselect" OR $fieldtyp != "checkbox") {
+                        if ($fieldtyp != "multiselect" && $fieldtyp != "checkbox") {
                             // Zählen wie viel von den Charakteren diesen Wert angegeben haben
                             $userdata_query = $db->query("SELECT * FROM ".TABLE_PREFIX."userfields
                             WHERE ufid IN (".$userids_string.")
@@ -6804,7 +6804,7 @@ function playerdirectory_build_statistics($userids_string){
 
                         $fieldid = $db->fetch_field($db->simple_select("application_ucp_fields", "id", "fieldname = '".$field."'"), "id");
 
-                        if ($fieldtyp != "multiselect" OR $fieldtyp != "checkbox") {
+                        if ($fieldtyp != "select_multiple" && $fieldtyp != "checkbox") {
                             // Zählen wie viel von den Charakteren diesen Wert angegeben haben
                             $userdata_query = $db->query("SELECT * FROM ".TABLE_PREFIX."application_ucp_userfields
                             WHERE uid IN (".$userids_string.")
