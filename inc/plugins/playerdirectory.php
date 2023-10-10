@@ -6769,7 +6769,7 @@ function playerdirectory_build_statistics($userids_string){
                             // Zählen wie viel von den Charakteren diesen Wert angegeben haben
                             $userdata_query = $db->query("SELECT * FROM ".TABLE_PREFIX."userfields
                             WHERE ufid IN (".$userids_string.")
-                            AND (concat(',',fid".$field.",',') LIKE '%,".$option.",%')
+                            AND (concat(',',fid".$field.",'\n') LIKE '%,".$option."\n%')
                             ");
                         }
                         $count = $db->num_rows($userdata_query);
