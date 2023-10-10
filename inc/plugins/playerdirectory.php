@@ -33,7 +33,7 @@ function playerdirectory_info(){
 		"website"	=> "https://github.com/little-evil-genius/Spielerverzeichnis",
 		"author"	=> "little.evil.genius",
 		"authorsite"	=> "https://storming-gates.de/member.php?action=profile&uid=1712",
-		"version"	=> "1.0",
+		"version"	=> "1.1",
 		"compatibility" => "18*"
 	);
 
@@ -2267,15 +2267,14 @@ function playerdirectory_admin_manage() {
                 // No errors - insert
                 if (empty($errors)) {
 
-                    if (!empty($mybb->get_input('applicationfield')) OR !empty($mybb->get_input('profilefield'))) {
+                    if (!empty($mybb->input['usergroups'])) {
+                        $usergroups = implode(",", $mybb->input['usergroups']);
+                    } else {
                         if (!empty($mybb->get_input('applicationfield'))) {
                             $input_field = $mybb->get_input('applicationfield');
-                        }
-                        if (!empty($mybb->get_input('profilefield'))) {
+                        } else {
                             $input_field = $mybb->get_input('profilefield');
                         }
-                    } else {
-                        $usergroups = implode(",", $mybb->input['usergroups']);
                     }
 
                     if ($mybb->get_input('type') != 4) {
