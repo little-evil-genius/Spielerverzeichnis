@@ -1,6 +1,6 @@
 <?php
-//error_reporting ( -1 );
-//ini_set ( 'display_errors', true );
+error_reporting ( -1 );
+ini_set ( 'display_errors', true );
 // Diagramm mithilfe der open source Lösung Chart.js (https://www.chartjs.org/) gebaut
 // Direktzugriff auf die Datei aus Sicherheitsgründen sperren
 if(!defined("IN_MYBB"))
@@ -3712,7 +3712,8 @@ function playerdirectory_misc(){
                                 $birthday_array = explode(".", $character[$birthday_fid]);
 
                                 // Vor Christus "v. Chr."
-                                if (str_contains($character[$birthday_fid], 'v. Chr.')) {
+                                $pos = strpos($character[$birthday_fid], 'v. Chr.');
+                                if ($pos !== false) {
 
                                     // Geburtstjahr - v entfernen
                                     $birthyear = str_replace(" v", "", $birthday_array[2]);
@@ -3789,7 +3790,8 @@ function playerdirectory_misc(){
 
 
                                 // Vor Christus "v. Chr."
-                                if (str_contains($string, 'v. Chr.')) {
+                                $pos = strpos($character[$birthday_field], 'v. Chr.');
+                                if ($pos !== false) {
                                 
                                     // Geburtstjahr - v entfernen
                                     $birthyear = str_replace(" v", "", $birth_year);
@@ -4310,7 +4312,8 @@ function playerdirectory_misc(){
                             $birthday_array = explode(".", $char[$birthday_fid]);
 
                             // Vor Christus "v. Chr."
-                            if (str_contains($char[$birthday_fid], 'v. Chr.')) {
+                            $pos = strpos($char[$birthday_fid], 'v. Chr.');
+                            if ($pos !== false) {
                             
                                 // Geburtstjahr - v entfernen
                                 $birthyear = str_replace(" v", "", $birthday_array[2]);
@@ -4385,7 +4388,8 @@ function playerdirectory_misc(){
                             }
 
                             // Vor Christus "v. Chr."
-                            if (str_contains($char[$birthday_field], 'v. Chr.')) {
+                            $pos = strpos($char[$birthday_field], 'v. Chr.');
+                            if ($pos !== false) {
                             
                                 // Geburtstjahr - v entfernen
                                 $birthyear = str_replace(" v", "", $birth_year);
@@ -6001,7 +6005,8 @@ function playerdirectory_misc(){
                         $birthday_array = explode(".", $characterstat[$birthday_fid]);
 
                         // Vor Christus "v. Chr."
-                        if (str_contains($characterstat[$birthday_fid], 'v. Chr.')) {
+                        $pos = strpos($characterstat[$birthday_fid], 'v. Chr.');
+                        if ($pos !== false) {
                         
                             // Geburtstjahr - v entfernen
                             $birthyear = str_replace(" v", "", $birthday_array[2]);
@@ -6078,7 +6083,8 @@ function playerdirectory_misc(){
                         }
 
                         // Vor Christus "v. Chr."
-                        if (str_contains($characterstat[$birthday_field], 'v. Chr.')) {
+                        $pos = strpos($characterstat[$birthday_field], 'v. Chr.');
+                        if ($pos !== false) {
                         
                             // Geburtstjahr - v entfernen
                             $birthyear = str_replace(" v", "", $birth_year);
