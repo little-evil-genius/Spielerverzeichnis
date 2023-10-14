@@ -3718,8 +3718,14 @@ function playerdirectory_misc(){
                                     $birthyear = str_replace(" v", "", $birthday_array[2]);
 
                                     // Alter = aktuelles Jahr + v. Chr. Jahr
-                                    $age = $inplay_array[2] + $birthyear;
-
+                                    // schon Geburtstag
+                                    if ($birthday_array[1] < $inplay_array[1]) {
+                                        $age = $inplay_array[2] + $birthyear;
+                                    } 
+                                    // noch Geburtstag
+                                    else {
+                                        $age = $inplay_array[2] + $birthyear - 1;
+                                    }
                                 }
                                 // nach Christus
                                 else {
@@ -3789,7 +3795,14 @@ function playerdirectory_misc(){
                                     $birthyear = str_replace(" v", "", $birth_year);
                                 
                                     // Alter = aktuelles Jahr + v. Chr. Jahr
-                                    $age = $inplay_array[2] + $birthyear;
+                                    // schon Geburtstag
+                                    if ($birthday_array[1] < $inplay_array[1]) {
+                                        $age = $inplay_array[2] + $birthyear;
+                                    } 
+                                    // noch Geburtstag
+                                    else {
+                                        $age = $inplay_array[2] + $birthyear - 1;
+                                    }
                                 
                                 }
                                 // nach Christus
@@ -4303,7 +4316,14 @@ function playerdirectory_misc(){
                                 $birthyear = str_replace(" v", "", $birthday_array[2]);
                             
                                 // Alter = aktuelles Jahr + v. Chr. Jahr
-                                $age = $inplay_array[2] + $birthyear;
+                                // schon Geburtstag
+                                if ($birthday_array[1] < $inplay_array[1]) {
+                                    $age = $inplay_array[2] + $birthyear;
+                                } 
+                                // noch Geburtstag
+                                else {
+                                    $age = $inplay_array[2] + $birthyear - 1;
+                                }
                             }
                             // nach Christus
                             else {
@@ -4369,9 +4389,16 @@ function playerdirectory_misc(){
                             
                                 // Geburtstjahr - v entfernen
                                 $birthyear = str_replace(" v", "", $birth_year);
-                            
+        
                                 // Alter = aktuelles Jahr + v. Chr. Jahr
-                                $age = $inplay_array[2] + $birthyear;
+                                // schon Geburtstag
+                                if ($birthday_array[1] < $inplay_array[1]) {
+                                    $age = $inplay_array[2] + $birthyear;
+                                } 
+                                // noch Geburtstag
+                                else {
+                                    $age = $inplay_array[2] + $birthyear - 1;
+                                }
                             
                             }
                             // nach Christus
@@ -5980,7 +6007,14 @@ function playerdirectory_misc(){
                             $birthyear = str_replace(" v", "", $birthday_array[2]);
                         
                             // Alter = aktuelles Jahr + v. Chr. Jahr
-                            $age = $inplay_array[2] + $birthyear;
+                            // schon Geburtstag
+                            if ($birthday_array[1] < $inplay_array[1]) {
+                                $age = $inplay_array[2] + $birthyear;
+                            } 
+                            // noch Geburtstag
+                            else {
+                                $age = $inplay_array[2] + $birthyear - 1;
+                            }
                         
                         }
                         // nach Christus
@@ -6050,7 +6084,14 @@ function playerdirectory_misc(){
                             $birthyear = str_replace(" v", "", $birth_year);
                         
                             // Alter = aktuelles Jahr + v. Chr. Jahr
-                            $age = $inplay_array[2] + $birthyear;
+                            // schon Geburtstag
+                            if ($birthday_array[1] < $inplay_array[1]) {
+                                $age = $inplay_array[2] + $birthyear;
+                            } 
+                            // noch Geburtstag
+                            else {
+                                $age = $inplay_array[2] + $birthyear - 1;
+                            }
                         
                         }
                         // nach Christus
