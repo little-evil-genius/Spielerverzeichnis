@@ -5147,18 +5147,25 @@ function playerdirectory_misc(){
                     // Geburstag aufsplitten
                     $birthday_array = explode(".", $bdays[$birthday_fid]);
 
-                    // Jahr überprüfen, ob 4 Ziffern
-                    if (strlen($birthday_array[2]) < 4) {
-                        
-                        $null = "";
-                        for ($i = strlen($birthday_array[2]); $i <= 3; $i++) {
-                            $null .= "0";
-                        }
-
-                        $birthyear = $null.$birthday_array[2];
-
-                    } else {
+                    // Vor Christus "v. Chr."
+                    $pos = strpos($bdays[$birthday_fid], 'v. Chr.');
+                    if ($pos !== false) {
+                        // YYYY v. Chr.
                         $birthyear = $birthday_array[2];
+                    }
+                    // nach Christus
+                    else {
+                        // Jahr überprüfen, ob 4 Ziffern
+                        if (strlen($birthday_array[2]) < 4) { 
+                            $null = "";
+                            for ($i = strlen($birthday_array[2]); $i <= 3; $i++) {
+                                $null .= "0";
+                            }         
+                            $birthyear = $null.$birthday_array[2];
+
+                        } else {
+                            $birthyear = $birthday_array[2];               
+                        }
                     }
 
                     $username = get_user($bdays['ufid'])['username'];
@@ -5205,20 +5212,26 @@ function playerdirectory_misc(){
                         $birth_year = $birthday_array[2];
                     }
 
-                    // Jahr überprüfen, ob 4 Ziffern
-                    if (strlen($birth_year) < 4) {
-                        
-                        $null = "";
-                        for ($i = strlen($birth_year); $i <= 3; $i++) {
-                            $null .= "0";
-                        }
-
-                        $birthyear = $null.$birth_year;
-
-                    } else {
+                    // Vor Christus "v. Chr."
+                    $pos = strpos($bdays['value'], 'v. Chr.');
+                    if ($pos !== false) {
+                        // YYYY v. Chr.
                         $birthyear = $birth_year;
                     }
-                    
+                    // nach Christus
+                    else {
+                        // Jahr überprüfen, ob 4 Ziffern
+                        if (strlen($birth_year) < 4) {
+                            $null = "";
+                            for ($i = strlen($birth_year); $i <= 3; $i++) {
+                                $null .= "0";
+                            }                    
+                            $birthyear = $null.$birth_year;
+
+                        } else {
+                            $birthyear = $birth_year;
+                        }
+                    }
 
                     $username = get_user($bdays['uid'])['username'];
                     $bday_array[$username] = $birth_day.".".$birth_month.".".$birthyear;
@@ -5302,9 +5315,34 @@ function playerdirectory_misc(){
 		foreach ($bday_array as $name => $bday) {
 	
             if ($birthday_option != 2) {
-                $geburtstag = new DateTime($bday);
-                $interval = $ingame->diff($geburtstag);
-                $alter = $interval->format("%Y");
+
+                // Vor Christus "v. Chr."
+                $pos = strpos($bday, 'v. Chr.');
+                if ($pos !== false) {
+                    // Geburstag aufsplitten
+                    $birthday_array = explode(".", $bday['value']);
+
+                    // Geburtstjahr - v entfernen	
+                    $birthyear = str_replace(" v", "", $birthday_array[2]);
+
+                    // Alter = aktuelles Jahr + v. Chr. Jahr
+                    // schon Geburtstag
+                    if ($birthday_array[1] < $inplay_array[1]) {
+                        $alter = $inplay_array[2] + $birthyear;
+                    }
+                    // noch Geburtstag
+                    else {
+                        $alter = $inplay_array[2] + $birthyear - 1;
+                    }
+
+                } 
+                // nach Christus
+                else {
+                    $geburtstag = new DateTime($bday);
+                    $interval = $ingame->diff($geburtstag);
+                    $alter = $interval->format("%Y");
+                }
+
             } else {
                 $alter = $bday;
             }
