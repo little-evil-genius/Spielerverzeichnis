@@ -1,6 +1,6 @@
 <?php
-error_reporting ( -1 );
-ini_set ( 'display_errors', true );
+//error_reporting ( -1 );
+//ini_set ( 'display_errors', true );
 // Diagramm mithilfe der open source Lösung Chart.js (https://www.chartjs.org/) gebaut
 // Direktzugriff auf die Datei aus Sicherheitsgründen sperren
 if(!defined("IN_MYBB"))
