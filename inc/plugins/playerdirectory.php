@@ -5317,10 +5317,10 @@ function playerdirectory_misc(){
             if ($birthday_option != 2) {
 
                 // Vor Christus "v. Chr."
-                $pos = strpos($bday, 'v. Chr.');
+                $pos = strpos($bday, 'v');
                 if ($pos !== false) {
                     // Geburstag aufsplitten
-                    $birthday_array = explode(".", $bday['value']);
+                    $birthday_array = explode(".", $bday);
 
                     // Geburtstjahr - v entfernen	
                     $birthyear = str_replace(" v", "", $birthday_array[2]);
