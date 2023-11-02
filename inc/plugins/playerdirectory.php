@@ -33,7 +33,7 @@ function playerdirectory_info(){
 		"website"	=> "https://github.com/little-evil-genius/Spielerverzeichnis",
 		"author"	=> "little.evil.genius",
 		"authorsite"	=> "https://storming-gates.de/member.php?action=profile&uid=1712",
-		"version"	=> "1.2",
+		"version"	=> "1.3",
 		"compatibility" => "18*"
 	);
 
@@ -3549,7 +3549,7 @@ function playerdirectory_misc(){
                 $last_name = implode(" ", $fullname); 
 
 				// AVATAR KRAM
-				if ($avatar_guest == 1) {
+				if ($avatar_guest == 0) {
 					if ($mybb->user['uid'] == '0' || $character['avatar'] == '') {
 						$avatar_url = $theme['imgdir']."/".$avatar_default;
 					} else {
@@ -4278,7 +4278,7 @@ function playerdirectory_misc(){
             $last_name = implode(" ", $fullname); 
 
 			// AVATAR KRAM
-            if ($avatar_guest == 1) {
+            if ($avatar_guest == 0) {
                 if ($mybb->user['uid'] == '0' || $char['avatar'] == '') {
                     $avatar_url = $theme['imgdir']."/".$avatar_default;
                 } else {
@@ -5485,7 +5485,7 @@ function playerdirectory_misc(){
                     $last_name = implode(" ", $fullname); 
             
                     // AVATAR KRAM
-                    if ($avatar_guest == 1) {
+                    if ($avatar_guest == 0) {
                         if ($mybb->user['uid'] == '0' || $quotes['avatar'] == '') {
                             $avatar_url = $theme['imgdir']."/".$avatar_default;
                         } else {
@@ -6009,7 +6009,7 @@ function playerdirectory_misc(){
         $last_name = implode(" ", $fullname);
 
         // AVATAR KRAM
-        if ($avatar_guest == 1) {
+        if ($avatar_guest == 0) {
             if ($mybb->user['uid'] == '0' || $characterstat['avatar'] == '') {
                 $avatar_url = $theme['imgdir']."/".$avatar_default;
             } else {
@@ -6473,7 +6473,7 @@ function playerdirectory_misc(){
                     $last_name = implode(" ", $fullname); 
             
                     // AVATAR KRAM
-                    if ($avatar_guest == 1) {
+                    if ($avatar_guest == 0) {
                         if ($mybb->user['uid'] == '0' || $quotes['avatar'] == '') {
                             $avatar_url = $theme['imgdir']."/".$avatar_default;
                         } else {
