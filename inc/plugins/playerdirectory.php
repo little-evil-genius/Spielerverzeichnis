@@ -33,7 +33,7 @@ function playerdirectory_info(){
 		"website"	=> "https://github.com/little-evil-genius/Spielerverzeichnis",
 		"author"	=> "little.evil.genius",
 		"authorsite"	=> "https://storming-gates.de/member.php?action=profile&uid=1712",
-		"version"	=> "1.3.1",
+		"version"	=> "1.3",
 		"compatibility" => "18*"
 	);
 
@@ -4254,15 +4254,11 @@ function playerdirectory_misc(){
             $charactername = "";
 			$charactername_formated = "";
             $charactername_link = "";
-            $fullname = "";
             $first_name = "";
             $last_name = "";
             $avatar_url = "";
             $usertitle = "";
             $age = "";
-            $age_years = "";
-            $regdate = "";
-            $lastactivity = "";
 
 			// MIT INFOS FÜLLEN
 			$charaID = $char['uid'];
