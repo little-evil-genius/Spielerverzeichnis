@@ -33,7 +33,7 @@ function playerdirectory_info(){
 		"website"	=> "https://github.com/little-evil-genius/Spielerverzeichnis",
 		"author"	=> "little.evil.genius",
 		"authorsite"	=> "https://storming-gates.de/member.php?action=profile&uid=1712",
-		"version"	=> "1.3",
+		"version"	=> "1.3.1",
 		"compatibility" => "18*"
 	);
 
@@ -4254,11 +4254,15 @@ function playerdirectory_misc(){
             $charactername = "";
 			$charactername_formated = "";
             $charactername_link = "";
+            $fullname = "";
             $first_name = "";
             $last_name = "";
             $avatar_url = "";
             $usertitle = "";
             $age = "";
+            $age_years = "";
+            $regdate = "";
+            $lastactivity = "";
 
 			// MIT INFOS FÜLLEN
 			$charaID = $char['uid'];
@@ -5010,7 +5014,7 @@ function playerdirectory_misc(){
             $uid = "";
             $charactername_formated = "";
             $charactername = "";
-            $regdate = "";
+            $regdate_firstchara = "";
             $firstchara_formated = "";
             $firstchara = "";
             $firstchara_formated_reg = "";
@@ -5022,15 +5026,15 @@ function playerdirectory_misc(){
 			$charactername_formated = build_profile_link(format_name($first['username'], $first['usergroup'], $first['displaygroup']), $uid);	
             // Nur Link
             $charactername = build_profile_link($first['username'], $uid);
-            $regdate = my_date('relative', $first['regdate']);
+            $regdate_firstchara = my_date('relative', $first['regdate']);
 
             // Ohne Registriert seit
             $firstchara_formated = $charactername_formated;
             $firstchara = $charactername;
 
             // Mit Registriert seit
-            $firstchara_formated_reg = $charactername_formated."<br>".$regdate;
-            $firstchara_reg = $charactername."<br>".$regdate;
+            $firstchara_formated_reg = $charactername_formated."<br>".$regdate_firstchara;
+            $firstchara_reg = $charactername."<br>".$regdate_firstchara;
         }
 
         // neuster Charakter
@@ -5046,7 +5050,7 @@ function playerdirectory_misc(){
             $uid = "";
             $charactername_formated = "";
             $charactername = "";
-            $regdate = "";
+            $regdate_lastchara = "";
             $lastchara_formated = "";
             $lastchara = "";
             $lastchara_formated_reg = "";
@@ -5058,15 +5062,15 @@ function playerdirectory_misc(){
 			$charactername_formated = build_profile_link(format_name($last['username'], $last['usergroup'], $last['displaygroup']), $uid);	
             // Nur Link
             $charactername = build_profile_link($last['username'], $uid);
-            $regdate = my_date('relative', $last['regdate']);
+            $regdate_lastchara = my_date('relative', $last['regdate']);
 
             // Ohne Registriert seit
             $lastchara_formated = $charactername_formated;
             $lastchara = $charactername;
 
             // Mit Registriert seit
-            $lastchara_formated_reg = $charactername_formated."<br>".$regdate;
-            $lastchara_reg = $charactername."<br>".$regdate;
+            $lastchara_formated_reg = $charactername_formated."<br>".$regdate_lastchara;
+            $lastchara_reg = $charactername."<br>".$regdate_lastchara;
         }
 
         // Heißester Charakter
