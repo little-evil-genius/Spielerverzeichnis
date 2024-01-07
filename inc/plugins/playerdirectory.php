@@ -3310,7 +3310,7 @@ function playerdirectory_misc(){
 	}
 
     // PARSER - HTML und CO erlauben
-    require_once MYBB_ROOT."inc/class_parser.php";;
+    require_once MYBB_ROOT."inc/class_parser.php";
     $parser = new postParser;
     $text_options = array(
         "allow_html" => 1,
