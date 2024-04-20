@@ -3295,7 +3295,20 @@ function playerdirectory_misc(){
     if ($birthday_option != 2) {               
         // Inplayjahr splitten - v. Chr.
         $inplay_array = explode(".", $last_inplayday);
-        $ingame = new DateTime($last_inplayday);
+        if (strlen($inplay_array[2]) < 4) {
+        $null = "";
+        for ($i = strlen($inplay_array[2]); $i <= 3; $i++) {
+            $null .= "0";
+        }
+        $new_ingameyear = $null.$inplay_array[2];
+    } else {
+        $new_ingameyear = $inplay_array[2];
+    }
+    $replacements = array(2 => $new_ingameyear);
+    $inplay_array = array_replace($inplay_array, $replacements);
+    $new_lastday = implode(".", $inplay_array);
+
+    $ingame = new DateTime($new_lastday);
     } else {
         $ingame = "";
     }
