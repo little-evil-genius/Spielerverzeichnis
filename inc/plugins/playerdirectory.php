@@ -33,7 +33,7 @@ function playerdirectory_info(){
 		"website"	=> "https://github.com/little-evil-genius/Spielerverzeichnis",
 		"author"	=> "little.evil.genius",
 		"authorsite"	=> "https://storming-gates.de/member.php?action=profile&uid=1712",
-		"version"	=> "1.4",
+		"version"	=> "1.4.1",
 		"compatibility" => "18*"
 	);
 
@@ -3175,6 +3175,11 @@ function playerdirectory_misc(){
 
     global $db, $cache, $mybb, $lang, $templates, $theme, $header, $headerinclude, $footer, $perpage, $page, $multipage, $query_join, $all_players, $birthday_fid, $characters_bit, $text_options, $parser, $notice_banner,$postactivity_months, $postactivity_poststat, $postactivity_perChara, $postactivity_scenestat;
 	
+    // return if the action key isn't part of the input
+    if ($mybb->get_input('action', MYBB::INPUT_STRING) !== 'playerdirectory' && $mybb->get_input('action', MYBB::INPUT_STRING) !== 'playerstatistic' && $mybb->get_input('action', MYBB::INPUT_STRING) !== 'characterstatistic' ) {
+        return;
+    }
+
 	// SPRACHDATEI
     $lang->load('playerdirectory');
 
