@@ -3436,7 +3436,7 @@ function playerdirectory_misc(){
         if ($directory_multipage != 0) {
     
             $perpage = $directory_multipage;
-            $input_page = $mybb->get_input('page', MyBB::INPUT_INT);;
+            $input_page = $mybb->get_input('page', MyBB::INPUT_INT);
             if($input_page) {
                 $start = ($input_page-1) *$perpage;
             }
