@@ -33,7 +33,7 @@ function playerdirectory_info(){
 		"website"	=> "https://github.com/little-evil-genius/Spielerverzeichnis",
 		"author"	=> "little.evil.genius",
 		"authorsite"	=> "https://storming-gates.de/member.php?action=profile&uid=1712",
-		"version"	=> "1.4.1",
+		"version"	=> "1.4.2",
 		"compatibility" => "18*"
 	);
 
@@ -4180,7 +4180,13 @@ function playerdirectory_misc(){
         
         $lang->playerdirectory_playerstat = $lang->sprintf($lang->playerdirectory_playerstat, $playername);
 
-        // Seite ist deaktiviert 
+        // ACCOUNTSWITCHER - HAUPT ID
+		$mainID = $db->fetch_field($db->simple_select("users", "as_uid", "uid = '".$playerID."'"), "as_uid");
+		if(empty($mainID)) {
+			$mainID = $playerID;
+		}
+
+        // Seite ist deaktiviert (Teamies und man selbst kann es dennoch einsehen)
         if ($playerstat_activated == 0) {
 			error($lang->playerdirectory_playerstat_deactivated);
 			return;
@@ -4196,12 +4202,6 @@ function playerdirectory_misc(){
 		if (empty($mybb->input['uid']) || empty($db->fetch_field($db->simple_select("users", "uid", "uid = '".$playerID."'"), "uid"))) {
 			error($lang->playerdirectory_error_uid);
 			return;
-		}
-
-        // ACCOUNTSWITCHER - HAUPT ID
-		$mainID = $db->fetch_field($db->simple_select("users", "as_uid", "uid = '".$playerID."'"), "as_uid");
-		if(empty($mainID)) {
-			$mainID = $playerID;
 		}
 
         // Spieler hat es eingestellt
@@ -4235,8 +4235,14 @@ function playerdirectory_misc(){
             $conf_guest = $lang->playerdirectory_notice_banner_conf;
            }
 
-           $banner_text = $lang->sprintf($lang->playerdirectory_notice_banner, $lang->playerdirectory_notice_banner_playerstat, $conf_user, $conf_guest);
-
+           // Gäste ausschließen
+           if ($playerstat_activated_guest == 0) {
+            $banner_text = $lang->sprintf($lang->playerdirectory_notice_banner_user, $lang->playerdirectory_notice_banner_playerstat, $conf_user);
+           } 
+           // Alle dürfen die Seite sehen
+           else {
+            $banner_text = $lang->sprintf($lang->playerdirectory_notice_banner_all, $lang->playerdirectory_notice_banner_playerstat, $conf_user, $conf_guest);
+           }
             eval("\$notice_banner = \"".$templates->get("playerdirectory_notice_banner")."\";");
         } else {
             $notice_banner = "";
@@ -5926,8 +5932,16 @@ function playerdirectory_misc(){
             $conf_guest = $lang->playerdirectory_notice_banner_conf;
            }
 
-           $banner_text = $lang->sprintf($lang->playerdirectory_notice_banner, $lang->playerdirectory_notice_banner_characterstat, $conf_user, $conf_guest);
-
+           
+           // Gäste ausschließen
+           if ($characterstat_activated_guest == 0) {
+            $banner_text = $lang->sprintf($lang->playerdirectory_notice_banner_user, $lang->playerdirectory_notice_banner_characterstat, $conf_user);
+           } 
+           // Alle dürfen die Seite sehen
+           else {
+            $banner_text = $lang->sprintf($lang->playerdirectory_notice_banner_all, $lang->playerdirectory_notice_banner_characterstat, $conf_user, $conf_guest);
+           }
+           
             eval("\$notice_banner = \"".$templates->get("playerdirectory_notice_banner")."\";");
         } else {
             $notice_banner = "";
