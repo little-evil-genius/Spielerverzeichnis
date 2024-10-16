@@ -6,12 +6,13 @@ Wem dieses Plugin zu komplex und umfangreich ist, hat die Möglichkeit das [Wer 
 <br>
 <b>HINWEIS:</b><br>
 Das Plugin ist kompatibel mit den klassischen Profilfeldern von MyBB und/oder dem <a href="https://github.com/katjalennartz/application_ucp">Steckbrief-Plugin von Risuena</a>.<br>
-Auch ist das Plugin mit verschiedenen Inplaytrackern/Szenentrackern kompatibel: mit dem <a href="https://github.com/its-sparks-fly/Inplaytracker-2.0">Inplaytracker 2.0 von sparks fly</a>, dem Nachfolger <a href="https://github.com/ItsSparksFly/mybb-inplaytracker">Inplaytracker 3.0 von sparks fly</a>, dem <a href="https://github.com/katjalennartz/scenetracker">Szenentracker von Risuena</a> und dem <a href="https://github.com/Ales12/inplaytracker">Inplaytracker von Ales</a>.<br>
+Auch ist das Plugin mit verschiedenen Inplaytrackern/Szenentrackern kompatibel: mit dem <a href="https://github.com/its-sparks-fly/Inplaytracker-2.0">Inplaytracker 2.0 von sparks fly</a>, dem Nachfolger <a href="https://github.com/ItsSparksFly/mybb-inplaytracker">Inplaytracker 3.0 von sparks fly</a>, dem <a href="https://github.com/little-evil-genius/Inplayszenen-Manager">Inplayszenen-Manager von mir (little.evil.genius)</a>, dem <a href="https://storming-gates.de/showthread.php?tid=1023729&pid=537783#pid537783">Szenentracker von Risuena</a>, dem <a href="https://github.com/Ales12/inplaytracker">Inplaytracker 1.0 von Ales</a> und dem Nachfolger <a href="https://github.com/Ales12/inplaytracker-2.0">Inplaytracker 2.0 von Ales</a>.<br>
 Genauso kann auch das Listen-Menü angezeigt werden, wenn man das <a href="https://github.com/ItsSparksFly/mybb-lists">Automatische Listen-Plugin von sparks fly</a> verwendet. Beides muss nur vorher eingestellt werden.
 
 # Vorrausetzung
+- Das ACP Modul <a href="https://github.com/little-evil-genius/rpgstuff_modul" target="_blank">RPG Stuff</a> <b>muss</b> vorhanden sein.
 - Der <a href="https://www.mybb.de/erweiterungen/18x/plugins-verschiedenes/enhanced-account-switcher/" target="_blank">Accountswitcher</a> von doylecc <b>muss</b> installiert sein. <br>
-- - Für eine Ausgabe von einem zufälligen Inplayzitat wird das <a href="https://github.com/its-sparks-fly/Inplayzitate-2.0"> Inplayzitate 2.0</a> oder <a href="https://github.com/ItsSparksFly/mybb-inplayquotes">Inplayzitate 3.0</a> Plugin von sparks fly oder die <a href="https://github.com/little-evil-genius/inplayzitate">Inplayzitate</a> von mir verwendet. Wenn man diese Option nicht möchte, muss keines der Plugins installiert sein.
+- Für eine Ausgabe von einem zufälligen Inplayzitat wird das <a href="https://github.com/its-sparks-fly/Inplayzitate-2.0"> Inplayzitate 2.0</a> oder <a href="https://github.com/ItsSparksFly/mybb-inplayquotes">Inplayzitate 3.0</a> Plugin von sparks fly oder <a href="https://github.com/Ales12/inplayquotes">Inplayzitate</a> Plugin von Ales oder die <a href="https://github.com/little-evil-genius/inplayzitate">Inplayzitate</a> von mir (little.evil.genius) verwendet. Wenn man diese Option nicht möchte, muss keines der Plugins installiert sein.
 
 # Datenbank-Änderungen
 ### hinzugefügte Tabelle:
@@ -98,10 +99,10 @@ Alle Templates wurden größtenteils ohne Tabellen-Struktur gecodet. Das Layout 
 - usercp_options - {$playerdirectory_options}
 
 # Neues CSS - playerdirectory.css
-Es wird automatisch in jedes bestehende und neue Design hinzugefügt. Man sollte es einfach einmal abspeichern, bevor man dies im Board mit der Untersuchungsfunktion bearbeiten will, da es dann passieren kann, dass das CSS für dieses Plugin in einen anderen Stylesheet gerutscht ist, obwohl es im ACP richtig ist.
+Es wird automatisch in jedes bestehende und neue Design hinzugefügt. Man sollte es einfach einmal abspeichern - auch im Default. Nach einem MyBB Upgrade fehlt der Stylesheets im Masterstyle? Im ACP Modul "RPG Erweiterungen" befindet sich der Menüpunkt "Stylesheets überprüfen" und kann von hinterlegten Plugins den Stylesheet wieder hinzufügen.
 
 # Links
-- euerforum.de/admin/index.php?module=user-playerdirectory
+- euerforum.de/admin/index.php?module=rpgstuff-playerdirectory
 - euerforum.de/misc.php?action=playerdirectory
 - euerforum.de/misc.php?action=playerstatistic&uid=X
 - euerforum.de/misc.php?action=characterstatistic&uid=X
