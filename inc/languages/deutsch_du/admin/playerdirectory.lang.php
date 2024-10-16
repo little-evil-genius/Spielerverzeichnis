@@ -1,4 +1,5 @@
 <?php
+$l['inplayquotes_error_rpgstuff'] = "Das ACP Modul <a href=\"https://github.com/little-evil-genius/rpgstuff_modul\" target=\"_blank\">\"RPG Stuff\"</a> muss vorhanden sein!";
 $l['playerdirectory_error_accountswitcher'] = "Das Plugin <a href=\"http://doylecc.altervista.org/bb/downloads.php?dlid=26&cat=2\" target=\"_blank\">\"Enhanced Account Switcher\"</a> muss installiert sein!";
 
 $l['playerdirectory_setting_title'] = "Spielerverzeichnis und Statistiken";
@@ -50,7 +51,8 @@ $l['playerdirectory_setting_inplaytracker_jule2'] = "Inplaytracker 2.0 von spark
 $l['playerdirectory_setting_inplaytracker_jule3'] = "Inplaytracker 3.0 von sparks fly";
 $l['playerdirectory_setting_inplaytracker_katja'] = "Szenentracker von risuena";
 $l['playerdirectory_setting_inplaytracker_lara'] = "Inplaytracker von little.evil.genius";
-$l['playerdirectory_setting_inplaytracker_ales'] = "Inplaytracker von Ales";
+$l['playerdirectory_setting_inplaytracker_ales1'] = "Inplaytracker 1.0 von Ales";
+$l['playerdirectory_setting_inplaytracker_ales2'] = "Inplaytracker 2.0 von Ales";
 $l['playerdirectory_setting_inplaystat'] = "letzte 12 Monate-Statistik";
 $l['playerdirectory_setting_inplaystat_desc'] = "Soll eine Inplaypost-Statistik der die letzten 12 Monate für jeden User und Charakter angezeigt werden?";
 $l['playerdirectory_setting_inplaystat_none'] = "keine Statistik";
