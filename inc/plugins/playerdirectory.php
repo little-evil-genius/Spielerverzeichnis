@@ -17,10 +17,12 @@ $plugins->add_hook("fetch_wol_activity_end", "playerdirectory_online_activity");
 $plugins->add_hook("build_friendly_wol_location_end", "playerdirectory_online_location");
 $plugins->add_hook("usercp_options_start", "playerdirectory_usercp_options");
 $plugins->add_hook("usercp_do_options_end", "playerdirectory_usercp_do_options");
-$plugins->add_hook("admin_user_action_handler", "playerdirectory_admin_user_action_handler");
-$plugins->add_hook("admin_user_permissions", "playerdirectory_admin_user_permissions");
-$plugins->add_hook("admin_user_menu", "playerdirectory_admin_user_menu");
+$plugins->add_hook("admin_rpgstuff_action_handler", "playerdirectory_admin_rpgstuff_action_handler");
+$plugins->add_hook("admin_rpgstuff_permissions", "playerdirectory_admin_rpgstuff_permissions");
+$plugins->add_hook("admin_rpgstuff_menu", "playerdirectory_admin_rpgstuff_menu");
 $plugins->add_hook("admin_load", "playerdirectory_admin_manage");
+$plugins->add_hook('admin_rpgstuff_update_stylesheet', 'playerdirectory_admin_update_stylesheet');
+$plugins->add_hook('admin_rpgstuff_update_plugin', 'playerdirectory_admin_update_plugin');
  
 // Die Informationen, die im Pluginmanager angezeigt werden
 function playerdirectory_info(){
@@ -33,7 +35,7 @@ function playerdirectory_info(){
 		"website"	=> "https://github.com/little-evil-genius/Spielerverzeichnis",
 		"author"	=> "little.evil.genius",
 		"authorsite"	=> "https://storming-gates.de/member.php?action=profile&uid=1712",
-		"version"	=> "1.4.2",
+		"version"	=> "1.5",
 		"compatibility" => "18*"
 	);
 
@@ -59,36 +61,20 @@ function playerdirectory_install(){
     // SPRACHDATEI
     $lang->load("playerdirectory");
 
+    // RPG Stuff Modul muss vorhanden sein
+    if (!file_exists(MYBB_ADMIN_DIR."/modules/rpgstuff/module_meta.php")) {
+		flash_message($lang->playerdirectory_error_rpgstuff, 'error');
+		admin_redirect('index.php?module=config-plugins');
+	}
+
     // Accountswitcher muss vorhanden sein
     if (!function_exists('accountswitcher_is_installed')) {
 		flash_message($lang->playerdirectory_error_accountswitcher, 'error');
 		admin_redirect('index.php?module=config-plugins');
 	}
 
-    // DATENBANKSPALTE USERS
-	$db->query("ALTER TABLE `".TABLE_PREFIX."users` ADD `playerdirectory_playerstat` INT(1) NOT NULL DEFAULT '0';");
-	$db->query("ALTER TABLE `".TABLE_PREFIX."users` ADD `playerdirectory_playerstat_guest` INT(1) NOT NULL DEFAULT '0';");
-	$db->query("ALTER TABLE `".TABLE_PREFIX."users` ADD `playerdirectory_characterstat` INT(1) NOT NULL DEFAULT '0';");
-	$db->query("ALTER TABLE `".TABLE_PREFIX."users` ADD `playerdirectory_characterstat_guest` INT(1) NOT NULL DEFAULT '0';");
-
-    // DATENBANK ERSTELLEN
-    $db->query("CREATE TABLE ".TABLE_PREFIX."playerdirectory_statistics(
-        `psid` int(10) unsigned NOT NULL AUTO_INCREMENT,
-        `name` VARCHAR(500) COLLATE utf8_general_ci NULL,
-        `identification` VARCHAR(500) COLLATE utf8_general_ci NULL,
-        `type` int(1) unsigned NOT NULL,
-        `legend` int(1) unsigned NOT NULL DEFAULT '0',
-        `field` VARCHAR(500) COLLATE utf8_general_ci NULL,
-        `ignor_option` VARCHAR(500) COLLATE utf8_general_ci NULL,
-        `usergroups` VARCHAR(500) COLLATE utf8_general_ci NULL,
-        `group_option` VARCHAR(500) COLLATE utf8_general_ci NULL,
-        `colors` VARCHAR(5000) COLLATE utf8_general_ci NOT NULL,
-        `custom_properties` int(1) unsigned NOT NULL DEFAULT '0',
-        PRIMARY KEY(`psid`),
-        KEY `psid` (`psid`)
-        )
-        ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci AUTO_INCREMENT=1 "
-    );
+    // DATENBANKTABELLE & FELDER
+    playerdirectory_database();
 
 	// EINSTELLUNGEN HINZUFÜGEN
     $maxdisporder = $db->fetch_field($db->query("SELECT MAX(disporder) FROM ".TABLE_PREFIX."settinggroups"), "MAX(disporder)");
@@ -99,207 +85,9 @@ function playerdirectory_install(){
 		'disporder'     => $maxdisporder+1,
 		'isdefault'     => 0
 	);
-			
-	$gid = $db->insert_query("settinggroups", $setting_group); 
-			
-	$setting_array = array(
-		'playerdirectory_directory' => array(
-			'title' => $lang->playerdirectory_setting_directory,
-			'description' => $lang->playerdirectory_setting_directory_desc,
-			'optionscode' => 'yesno',
-			'value' => '0', // Default
-			'disporder' => 1
-		),
-		'playerdirectory_directory_guest' => array(
-			'title' => $lang->playerdirectory_setting_directory_guest,
-			'description' => $lang->playerdirectory_setting_directory_guest_desc,
-			'optionscode' => 'yesno',
-			'value' => '0', // Default
-			'disporder' => 2
-		),
-		'playerdirectory_directory_multipage' => array(
-			'title' => $lang->playerdirectory_setting_directory_multipage,
-			'description' => $lang->playerdirectory_setting_directory_multipage_desc,
-			'optionscode' => 'numeric',
-			'value' => '20', // Default
-			'disporder' => 3
-		),
-		'playerdirectory_directory_teamaccounts' => array(
-			'title' => $lang->playerdirectory_setting_directory_teamaccounts,
-			'description' => $lang->playerdirectory_setting_directory_teamaccounts_desc,
-			'optionscode' => 'text',
-			'value' => '1', // Default
-			'disporder' => 4
-		),
-		'playerdirectory_playerstat' => array(
-			'title' => $lang->playerdirectory_setting_playerstat,
-			'description' => $lang->playerdirectory_setting_playerstat_desc,
-			'optionscode' => 'yesno',
-			'value' => '0', // Default
-			'disporder' => 5
-		),
-		'playerdirectory_playerstat_guest' => array(
-			'title' => $lang->playerdirectory_setting_playerstat_guest,
-			'description' => $lang->playerdirectory_setting_playerstat_guest_desc,
-			'optionscode' => 'yesno',
-			'value' => '0', // Default
-			'disporder' => 6
-		),
-		'playerdirectory_characterstat' => array(
-			'title' => $lang->playerdirectory_setting_characterstat,
-			'description' => $lang->playerdirectory_setting_characterstat_desc,
-			'optionscode' => 'yesno',
-			'value' => '0', // Default
-			'disporder' => 7
-		),
-		'playerdirectory_characterstat_guest' => array(
-			'title' => $lang->playerdirectory_setting_characterstat_guest,
-			'description' => $lang->playerdirectory_setting_characterstat_guest_desc,
-			'optionscode' => 'yesno',
-			'value' => '0', // Default
-			'disporder' => 8
-		),
-		'playerdirectory_profilfeldsystem' => array(
-			'title' => $lang->playerdirectory_setting_profilfeldsystem,
-			'description' => $lang->playerdirectory_setting_profilfeldsystem_desc,
-			'optionscode' => 'select\n0='.$lang->playerdirectory_setting_profilfeldsystem_profilefield.'\n1='.$lang->playerdirectory_setting_profilfeldsystem_applicationfield.'\n2='.$lang->playerdirectory_setting_profilfeldsystem_both,
-			'value' => '0', // Default
-			'disporder' => 9
-		),
-		'playerdirectory_playername' => array(
-			'title' => $lang->playerdirectory_setting_playername,
-			'description' => $lang->playerdirectory_setting_playername_desc,
-			'optionscode' => 'text',
-			'value' => '4', // Default
-			'disporder' => 10
-		),
-		'playerdirectory_avatar_default' => array(
-			'title' => $lang->playerdirectory_setting_avatar_default,
-			'description' => $lang->playerdirectory_setting_avatar_default_desc,
-			'optionscode' => 'text',
-			'value' => 'default_avatar.png', // Default
-			'disporder' => 11
-		),
-		'playerdirectory_avatar_guest' => array(
-			'title' => $lang->playerdirectory_setting_avatar_guest,
-			'description' => $lang->playerdirectory_setting_avatar_guest_desc,
-			'optionscode' => 'yesno',
-			'value' => '0', // Default
-			'disporder' => 12
-		),
-		'playerdirectory_birthday' => array(
-			'title' => $lang->playerdirectory_setting_birthday,
-			'description' => $lang->playerdirectory_setting_birthday_desc,
-			'optionscode' => 'select\n0='.$lang->playerdirectory_setting_birthday_field.'\n1='.$lang->playerdirectory_setting_birthday_mybb.'\n2='.$lang->playerdirectory_setting_birthday_age,
-			'value' => '0', // Default
-			'disporder' => 13
-		),
-		'playerdirectory_birthday_field' => array(
-			'title' => $lang->playerdirectory_setting_birthday_field_id,
-			'description' => $lang->playerdirectory_setting_birthday_field_id_desc,
-			'optionscode' => 'text',
-			'value' => '', // Default
-			'disporder' => 14
-		),
-		'playerdirectory_age_field' => array(
-			'title' => $lang->playerdirectory_setting_birthday_age_field,
-			'description' => $lang->playerdirectory_setting_birthday_age_field_desc,
-			'optionscode' => 'text',
-			'value' => '', // Default
-			'disporder' => 15
-		),
-		'playerdirectory_inplayday' => array(
-			'title' => $lang->playerdirectory_setting_inplayday,
-			'description' => $lang->playerdirectory_setting_inplayday_desc,
-			'optionscode' => 'text',
-			'value' => '31.03.2020', // Default
-			'disporder' => 16
-		),
-		'playerdirectory_inplaytracker' => array(
-			'title' => $lang->playerdirectory_setting_inplaytracker,
-			'description' => $lang->playerdirectory_setting_inplaytracker_desc,
-			'optionscode' => 'select\n0='.$lang->playerdirectory_setting_inplaytracker_jule2.'\n1='.$lang->playerdirectory_setting_inplaytracker_jule3.'\n2='.$lang->playerdirectory_setting_inplaytracker_katja.'\n3='.$lang->playerdirectory_setting_inplaytracker_lara.'\n4='.$lang->playerdirectory_setting_inplaytracker_ales,
-			'value' => '1', // Default
-			'disporder' => 17
-		),
-		'playerdirectory_inplaystat' => array(
-			'title' => $lang->playerdirectory_setting_inplaystat,
-			'description' => $lang->playerdirectory_setting_inplaystat_desc,
-			'optionscode' => 'select\n0='.$lang->playerdirectory_setting_inplaystat_none.'\n1='.$lang->playerdirectory_setting_inplaystat_bar.'\n2='.$lang->playerdirectory_setting_inplaystat_word,
-			'value' => '0', // Default
-			'disporder' => 18
-		),
-		'playerdirectory_scenestat' => array(
-			'title' => $lang->playerdirectory_setting_scenestat,
-			'description' => $lang->playerdirectory_setting_scenestat_desc,
-			'optionscode' => 'select\n0='.$lang->playerdirectory_setting_scenestat_none.'\n1='.$lang->playerdirectory_setting_scenestat_bar.'\n2='.$lang->playerdirectory_setting_scenestat_pie.'\n3='.$lang->playerdirectory_setting_scenestat_word,
-			'value' => '0', // Default
-			'disporder' => 19
-		),
-		'playerdirectory_scenestat_legend' => array(
-			'title' => $lang->playerdirectory_setting_scenestat_legend,
-			'description' => $lang->playerdirectory_setting_scenestat_legend_desc,
-			'optionscode' => 'yesno',
-			'value' => '0', // Default
-			'disporder' => 20
-		),
-		'playerdirectory_poststat' => array(
-			'title' => $lang->playerdirectory_setting_poststat,
-			'description' => $lang->playerdirectory_setting_poststat_desc,
-			'optionscode' => 'select\n0='.$lang->playerdirectory_setting_poststat_none.'\n1='.$lang->playerdirectory_setting_poststat_bar.'\n2='.$lang->playerdirectory_setting_poststat_pie.'\n3='.$lang->playerdirectory_setting_poststat_word,
-			'value' => '0', // Default
-			'disporder' => 21
-		),
-		'playerdirectory_poststat_legend' => array(
-			'title' => $lang->playerdirectory_setting_poststat_legend,
-			'description' => $lang->playerdirectory_setting_poststat_legend_desc,
-			'optionscode' => 'yesno',
-			'value' => '0', // Default
-			'disporder' => 22
-		),
-		'playerdirectory_colorstat' => array(
-			'title' => $lang->playerdirectory_setting_colorstat,
-			'description' => $lang->playerdirectory_setting_colorstat_desc,
-			'optionscode' => 'textarea',
-			'value' => '#8baddc, #5e7596, #70aab5, #365358, #90cec1, #5a9286, #afd49b, #6d875f, #cdbca5, #887d6e, #8f99cd, #697198, #6c6c6c, #4b4b4b, #fff2ca, #fae29a, #fccb8d, #f7b284, #946b6e, #50383a', // Default
-			'disporder' => 23
-		),
-		'playerdirectory_inplayquotes' => array(
-			'title' => $lang->playerdirectory_setting_inplayquotes,
-			'description' => $lang->playerdirectory_setting_inplayquotes_desc,
-			'optionscode' => 'yesno',
-			'value' => '0', // Default
-			'disporder' => 24
-		),
-		'playerdirectory_lists' => array(
-			'title' => $lang->playerdirectory_setting_lists,
-			'description' => $lang->playerdirectory_setting_lists_desc,
-			'optionscode' => 'text',
-			'value' => 'lists.php', // Default
-			'disporder' => 25
-		),
-		'playerdirectory_lists_menu' => array(
-			'title' => $lang->playerdirectory_setting_lists_menu,
-			'description' => $lang->playerdirectory_setting_lists_menu_desc,
-			'optionscode' => 'select\n0='.$lang->playerdirectory_setting_lists_menu_none.'\n1='.$lang->playerdirectory_setting_lists_menu_jule.'\n2='.$lang->playerdirectory_setting_lists_menu_own,
-			'value' => '0', // Default
-			'disporder' => 26
-		),
-        'playerdirectory_lists_menu_tpl' => array(
-            'title' => $lang->playerdirectory_setting_lists_menu_tpl,
-            'description' => $lang->playerdirectory_setting_lists_menu_tpl_desc,
-            'optionscode' => 'text',
-            'value' => 'lists_nav', // Default
-            'disporder' => 27
-        ),
-	);
-			
-	foreach($setting_array as $name => $setting)
-	{
-		$setting['name'] = $name;
-		$setting['gid']  = $gid;
-		$db->insert_query('settings', $setting);
-	}
+	$db->insert_query("settinggroups", $setting_group);  
+		
+    playerdirectory_settings();
 	rebuild_settings();
 
 	// TEMPLATES ERSTELLEN
@@ -309,1414 +97,19 @@ function playerdirectory_install(){
         "title" => $db->escape_string("Spielerverzeichnis und Statistiken"),
     );
     $db->insert_query("templategroups", $templategroup);
-
-    $insert_array = array(
-        'title'		=> 'playerdirectory_characterstat',
-        'template'	=> $db->escape_string('<html>
-        <head>
-            <title>
-                {$mybb->settings[\'bbname\']} - {$lang->playerdirectory_characterstat}
-            </title>
-            {$headerinclude}
-        </head>
-        <body>
-            {$header}
-            <table width="100%" cellspacing="0" cellpadding="0">
-                <tr>
-                    <td>
-                        {$notice_banner}
-                        <div class="playerdirectory_headline">{$lang->playerdirectory_characterstat}</div>
-                        {$random_inplayquote}
-    
-                        <div class="playerdirectory_characterstat_statistic">
-    
-                            <div class="playerdirectory_characterstat_stat">
-                                <div class="playerdirectory_characterstat_question">{$lang->playerdirectory_statistic_regdate}</div>
-                                <div class="playerdirectory_characterstat_answer">{$regdate}</div>		
-                            </div>
-                            <div class="playerdirectory_characterstat_stat">	
-                                <div class="playerdirectory_characterstat_question">{$lang->playerdirectory_statistic_lastactivity}</div>
-                                <div class="playerdirectory_characterstat_answer">{$lastactivity}</div>	
-                            </div>
-                            <div class="playerdirectory_characterstat_stat">	
-                                <div class="playerdirectory_characterstat_question">{$lang->playerdirectory_statistic_timeonline}</div>
-                                <div  class="playerdirectory_characterstat_answer">{$timeonline}</div>	
-                            </div>
-                            <div class="playerdirectory_characterstat_stat">
-                                <div class="playerdirectory_characterstat_question">{$lang->playerdirectory_statistic_lastinplaypost}</div>
-                                <div class="playerdirectory_characterstat_answer">{$lastinplaypost}</div>		
-                            </div>
-    
-    
-                            <div class="playerdirectory_characterstat_stat">
-                                <div class="playerdirectory_characterstat_question">{$lang->playerdirectory_statistic_allinplayposts}</div>
-                                <div class="playerdirectory_characterstat_answer">{$allinplayposts_formatted}</div>		
-                            </div>
-                            <div class="playerdirectory_characterstat_stat">	
-                                <div class="playerdirectory_characterstat_question">{$lang->playerdirectory_statistic_allinplayscenes}</div>
-                                <div class="playerdirectory_characterstat_answer">{$allinplayscenes_formatted}</div>	
-                            </div>
-                            <div class="playerdirectory_characterstat_stat">	
-                                <div class="playerdirectory_characterstat_question">{$lang->playerdirectory_statistic_hotscene}</div>
-                                <div class="playerdirectory_characterstat_answer">{$hotscene}</div>	
-                            </div>
-                            <div class="playerdirectory_characterstat_stat">	
-                                <div class="playerdirectory_characterstat_question">{$lang->playerdirectory_statistic_viewscene}</div>
-                                <div class="playerdirectory_characterstat_answer">{$viewscene}</div>	
-                            </div>
-    
-    
-                            <div class="playerdirectory_characterstat_stat">
-                                <div class="playerdirectory_characterstat_question">{$lang->playerdirectory_statistic_charactersall}</div>
-                                <div class="playerdirectory_characterstat_answer">{$charactersall_formatted}</div>		
-                            </div>
-                            <div class="playerdirectory_characterstat_stat">	
-                                <div class="playerdirectory_characterstat_question">{$lang->playerdirectory_statistic_averageCharacters}</div>
-                                <div class="playerdirectory_characterstat_answer">{$averageCharacters_formatted}</div>	
-                            </div>
-                            <div class="playerdirectory_characterstat_stat">	
-                                <div class="playerdirectory_characterstat_question">{$lang->playerdirectory_statistic_wordsall}</div>
-                                <div class="playerdirectory_characterstat_answer">{$wordsall_formatted}</div>	
-                            </div>
-                            <div class="playerdirectory_characterstat_stat">	
-                                <div class="playerdirectory_characterstat_question">{$lang->playerdirectory_statistic_averageWords}</div>
-                                <div class="playerdirectory_characterstat_answer">{$averageWords_formatted}</div>	
-                            </div>
-    
-                            {$postactivity_months}
-    
-                        </div>
-                    </td>
-                </tr>
-            </table>
-            {$footer}
-        </body>
-    </html>'),
-        'sid'		=> '-2',
-        'dateline'	=> TIME_NOW
-    );
-    $db->insert_query("templates", $insert_array);
-
-    $insert_array = array(
-        'title'		=> 'playerdirectory_characterstat_inplayquote',
-        'template'	=> $db->escape_string('<div class="playerdirectory_inplayquote">
-        <div class="playerdirectory_inplayquote_avatar"><img src="{$avatar_url}"></div>
-        <div class="playerdirectory_inplayquote_container">
-            <div class="playerdirectory_quote">
-            {$quote}
-            </div>
-            <div class="playerdirectory_quote_user">
-                <b>{$charactername}</b><br>
-                <span>{$scenelink}</span>
-            </div>
-        </div>
-    </div>'),
-        'sid'		=> '-2',
-        'dateline'	=> TIME_NOW
-    );
-    $db->insert_query("templates", $insert_array);
-
-    $insert_array = array(
-        'title'		=> 'playerdirectory_directory',
-        'template'	=> $db->escape_string('<html>
-        <head>
-            <title>{$mybb->settings[\'bbname\']} - {$lang->playerdirectory_directory}</title>
-            {$headerinclude}
-        </head>
-        <body>
-            {$header}
-            {$lists_menu}
-            <table border="0" cellspacing="{$theme[\'borderwidth\']}" cellpadding="{$theme[\'tablespace\']}" class="tborder" width="100%">
-                <tr>
-                    <td class="thead" colspan="3"><strong>{$lang->playerdirectory_directory}</strong></td>
-                </tr>
-                <tr>
-                    <td class="tcat" align="center" style="width:33%"><span class="smalltext"><strong>{$count_allPlayers}</strong></span></td>
-                    <td class="tcat" align="center" style="width:33%"><span class="smalltext"><strong>{$count_allCharacters}</strong></span></td>
-                    <td class="tcat" align="center" style="width:33%"><span class="smalltext"><strong>{$count_averagecharacters}</strong></span></td>
-                </tr>
-                <tr>
-                    <td class="trow1" colspan="3">
-                        <div class="playerdirectory_directory">
-                            {$all_players}
-                        </div>
-                        {$multipage}
-                    </td>
-                </tr>
-            </table>
-            {$footer}
-        </body>
-    </html>'),
-        'sid'		=> '-2',
-        'dateline'	=> TIME_NOW
-    );
-    $db->insert_query("templates", $insert_array);
-
-    $insert_array = array(
-        'title'		=> 'playerdirectory_directory_characters',
-        'template'	=> $db->escape_string('<div class="directory_characters">
-        <div class="directory_characters_avatar">
-            <img src="{$avatar_url}">
-        </div>
-        <div>
-            <div class="directory_characters_fact"><strong>{$charactername}</strong></div>
-            <div class="directory_characters_fact">{$character_inplaystat}</div>
-            {$character_button}
-        </div>
-    </div>'),
-        'sid'		=> '-2',
-        'dateline'	=> TIME_NOW
-    );
-    $db->insert_query("templates", $insert_array);
-
-    $insert_array = array(
-        'title'		=> 'playerdirectory_directory_user',
-        'template'	=> $db->escape_string('<div class="playerdirectory_user">
-        <div class="playerdirectory_headline">{$playername}</div>
-        <div class="playerdirectory_user_information">
-            <div class="playerdirectory_user_information_item"><b>{$lang->playerdirectory_directory_user_regdate}</b> {$regdate}</div>
-            <div class="playerdirectory_user_information_item"><b>{$lang->playerdirectory_directory_user_lastactivity}</b> {$lastactivity}</div>
-            <div class="playerdirectory_user_information_item">{$player_inplaystat}</div>
-            {$player_button}
-        </div>
-        <div class="playerdirectory_subline">{$charas_count}</div>
-        <div class="playerdirectory_user_accounts">
-            {$characters}
-        </div>
-    </div>'),
-        'sid'		=> '-2',
-        'dateline'	=> TIME_NOW
-    );
-    $db->insert_query("templates", $insert_array);
-
-    $insert_array = array(
-        'title'		=> 'playerdirectory_menu_link',
-        'template'	=> $db->escape_string('<li><a href="{$mybb->settings[\'bburl\']}/misc.php?action=playerdirectory" class="memberlist">{$lang->playerdirectory_directory}</a></li>'),
-        'sid'		=> '-2',
-        'dateline'	=> TIME_NOW
-    );
-    $db->insert_query("templates", $insert_array);
-
-    $insert_array = array(
-        'title'		=> 'playerdirectory_notice_banner',
-        'template'	=> $db->escape_string('<div class="pm_alert">{$banner_text}</div>'),
-        'sid'		=> '-2',
-        'dateline'	=> TIME_NOW
-    );
-    $db->insert_query("templates", $insert_array);
-
-    $insert_array = array(
-        'title'		=> 'playerdirectory_playerstat',
-        'template'	=> $db->escape_string('<html>
-        <head>
-            <title>
-                {$mybb->settings[\'bbname\']} - {$lang->playerdirectory_playerstat}
-            </title>
-            {$headerinclude}
-        </head>
-        <body>
-            {$header}
-            <table width="100%" cellspacing="0" cellpadding="0">
-                <tr>
-                    <td>
-                        {$notice_banner}
-                        <div class="playerdirectory_headline">{$lang->playerdirectory_playerstat}</div>
-                        <div class="playerdirectory_subline">{$lang->playerdirectory_inplaystatistic}</div>
-    
-                        <div class="playerdirectory_playerstat_statistic">
-    
-                            <div class="playerdirectory_playerstat_stat">
-                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_regdate}</div>
-                                <div class="playerdirectory_playerstat_answer">{$regdate}</div>		
-                            </div>
-                            <div class="playerdirectory_playerstat_stat">	
-                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_lastactivity}</div>
-                                <div class="playerdirectory_playerstat_answer">{$lastactivity}</div>	
-                            </div>
-                            <div class="playerdirectory_playerstat_stat">	
-                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_timeonline}</div>
-                                <div  class="playerdirectory_playerstat_answer">{$timeonline}</div>	
-                            </div>
-                            <div class="playerdirectory_playerstat_stat">
-                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_lastinplaypost}</div>
-                                <div class="playerdirectory_playerstat_answer">{$lastinplaypost}</div>		
-                            </div>
-    
-    
-                            <div class="playerdirectory_playerstat_stat">
-                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_allinplayposts}</div>
-                                <div class="playerdirectory_playerstat_answer">{$allinplayposts_formatted}</div>		
-                            </div>
-                            <div class="playerdirectory_playerstat_stat">	
-                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_allinplayscenes}</div>
-                                <div class="playerdirectory_playerstat_answer">{$allinplayscenes_formatted}</div>	
-                            </div>
-                            <div class="playerdirectory_playerstat_stat">	
-                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_hotscene}</div>
-                                <div class="playerdirectory_playerstat_answer">{$hotscene}</div>	
-                            </div>
-                            <div class="playerdirectory_playerstat_stat">	
-                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_viewscene}</div>
-                                <div class="playerdirectory_playerstat_answer">{$viewscene}</div>	
-                            </div>
-    
-    
-                            <div class="playerdirectory_playerstat_stat">
-                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_charactersall}</div>
-                                <div class="playerdirectory_playerstat_answer">{$charactersall_formatted}</div>		
-                            </div>
-                            <div class="playerdirectory_playerstat_stat">	
-                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_averageCharacters}</div>
-                                <div class="playerdirectory_playerstat_answer">{$averageCharacters_formatted}</div>	
-                            </div>
-                            <div class="playerdirectory_playerstat_stat">	
-                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_wordsall}</div>
-                                <div class="playerdirectory_playerstat_answer">{$wordsall_formatted}</div>	
-                            </div>
-                            <div class="playerdirectory_playerstat_stat">	
-                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_averageWords}</div>
-                                <div class="playerdirectory_playerstat_answer">{$averageWords_formatted}</div>	
-                            </div>
-    
-                        </div>
-    
-                        {$postactivity_months}
-    
-                        <div class="playerdirectory_subline">{$lang->playerdirectory_characterstatistic}</div>
-                        
-                        {$random_inplayquote}
-                        
-                        <div class="playerdirectory_playerstat_statistic">
-                            <div class="playerdirectory_playerstat_stat">
-                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_charas}</div>
-                                <div class="playerdirectory_playerstat_answer">{$count_charas}</div>		
-                            </div>
-                            <div class="playerdirectory_playerstat_stat">	
-                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_firstchara}</div>
-                                <div class="playerdirectory_playerstat_answer">{$firstchara}</div>	
-                            </div>
-                            <div class="playerdirectory_playerstat_stat">	
-                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_lastchara}</div>
-                                <div class="playerdirectory_playerstat_answer">{$lastchara}</div>	
-                            </div>
-                            <div class="playerdirectory_playerstat_stat">	
-                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_hotchara}</div>
-                                <div class="playerdirectory_playerstat_answer">{$hotCharacter}</div>	
-                            </div>
-    
-                            <div class="playerdirectory_playerstat_stat">
-                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_minage}</div>
-                                <div class="playerdirectory_playerstat_answer">{$minage}</div>		
-                            </div>
-                            <div class="playerdirectory_playerstat_stat">	
-                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_maxage}</div>
-                                <div class="playerdirectory_playerstat_answer">{$maxage}</div>	
-                            </div>
-                            <div class="playerdirectory_playerstat_stat">	
-                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_averageage}</div>
-                                <div class="playerdirectory_playerstat_answer">{$averageage}</div>	
-                            </div>
-                            <div class="playerdirectory_playerstat_stat">	
-                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_hotcharascene}</div>
-                                <div class="playerdirectory_playerstat_answer">{$hotcharascene}</div>	
-                            </div>
-    
-                        </div>
-                        {$postactivity_perChara}
-                        {$characters_bit}
-                    </td>
-                </tr>
-            </table>
-            {$footer}
-        </body>
-    </html>'),
-        'sid'		=> '-2',
-        'dateline'	=> TIME_NOW
-    );
-    $db->insert_query("templates", $insert_array);
-
-    $insert_array = array(
-        'title'		=> 'playerdirectory_playerstat_characters',
-        'template'	=> $db->escape_string('<div class="playerdirectory_playerstat_characters">
-        <div class="playerdirectory_playerstat_avatar">
-            <img src="{$avatar_url}">
-        </div>
-        <div class="playerdirectory_playerstat_infos">
-            <div class="playerdirectory_playerstat_username">{$charactername} | {$age_years}
-                <span style="float:right">{$character_button}</span>
-            </div>
-            <div class="playerdirectory_playerstat_usertitle">{$usertitle}</div>
-            <div class="playerdirectory_playerstat_fact"><b>{$lang->playerdirectory_statistic_regdate}</b> {$regdate}</div>
-            <div class="playerdirectory_playerstat_fact"><b>{$lang->playerdirectory_statistic_lastactivity}</b> {$lastactivity}</div>
-            <div class="playerdirectory_playerstat_fact">{$character_inplaystat}</div>
-        </div>
-    </div>'),
-        'sid'		=> '-2',
-        'dateline'	=> TIME_NOW
-    );
-    $db->insert_query("templates", $insert_array);
-
-    $insert_array = array(
-        'title'		=> 'playerdirectory_playerstat_inplayquote',
-        'template'	=> $db->escape_string('<div class="playerdirectory_inplayquote">
-        <div class="playerdirectory_inplayquote_avatar"><img src="{$avatar_url}"></div>
-        <div class="playerdirectory_inplayquote_container">
-            <div class="playerdirectory_quote">
-            {$quote}
-            </div>
-            <div class="playerdirectory_quote_user">
-                <b>{$charactername}</b><br>
-                <span>{$scenelink}</span>
-            </div>
-        </div>
-    </div>'),
-        'sid'		=> '-2',
-        'dateline'	=> TIME_NOW
-    );
-    $db->insert_query("templates", $insert_array);
-
-    $insert_array = array(
-        'title'		=> 'playerdirectory_playerstat_ownstat',
-        'template'	=> $db->escape_string('<div class="playerdirectory_playerstat_ownstat_headline">{$statisticname}</div>{$ownstat_bit}'),
-        'sid'		=> '-2',
-        'dateline'	=> TIME_NOW
-    );
-    $db->insert_query("templates", $insert_array);
-
-    $insert_array = array(
-        'title'		=> 'playerdirectory_playerstat_ownstat_bar',
-        'template'	=> $db->escape_string('<div class="playerdirectory_playerstat_ownstat_headline">{$statisticname}</div>
-        <div class="playerdirectory_playerstat_ownstat_chart">
-            <canvas id="{$chartname}"></canvas>
-        </div>
-        
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
-        <script>
-            var style = getComputedStyle(document.body);
-            var text = style.getPropertyValue(\'--chart-text\');
-            // data define for bar chart
-            var myData = {
-                labels: {$labels_chart},
-                datasets: [{
-                    backgroundColor: {$backgroundColor},
-                    data: {$data_chart}
-                }]
-            };
-            // Options define for display value on top of bars
-            var myoption = {
-                maintainAspectRatio: false,
-                legend: {
-                    "display": false
-                },
-                responsive: true,
-                tooltips: {
-                    enabled: true
-                },
-                hover: {
-                    animationDuration: 1
-                },
-                animation: {
-                    duration: 1,
-                    onComplete: function () {
-                        var chartInstance = this.chart,
-                            ctx = chartInstance.ctx;
-                        ctx.textAlign = \'center\';
-                        ctx.fillStyle = text;
-                        ctx.textBaseline = \'bottom\';
-                        // Loop through each data in the datasets
-                        this.data.datasets.forEach(function (dataset, i) {
-                            var meta = chartInstance.controller.getDatasetMeta(i);
-                            meta.data.forEach(function (bar, index) {
-                                var data = dataset.data[index];
-                                ctx.fillText(data, bar._model.x, bar._model.y - 5);
-        
-                            });
-                        });
-                    }
-                },
-                scales: {
-                    yAxes: [{
-                        display: true,
-                        gridLines: {
-                            display: false
-                        },
-                        ticks: {
-                            max: {$maxCount},
-                            display: false,
-                            beginAtZero: true,
-                            color: accent
-                        }
-                    }],
-                    xAxes: [{
-                        gridLines: {
-                            display: false
-                        },
-                        ticks: {
-                            beginAtZero: true,
-                            fontColor: text
-                        }
-                    }]
-                }
-            };
-            // Code to draw Chart
-            var ctx = document.getElementById(\'{$chartname}\').getContext(\'2d\');
-            var myChart = new Chart(ctx, {
-                type: \'bar\', // Define chart type
-                data: myData, // Chart data
-                options: myoption // Chart Options [This is optional paramenter use to add some extra things in the chart].
-            });
-        </script>'),
-        'sid'		=> '-2',
-        'dateline'	=> TIME_NOW
-    );
-    $db->insert_query("templates", $insert_array);
-
-    $insert_array = array(
-        'title'		=> 'playerdirectory_playerstat_ownstat_bit',
-        'template'	=> $db->escape_string('<div class="playerdirectory_playerstat_ownstat_bit_option">
-        <div class="playerdirectory_playerstat_ownstat_bit_optionname">{$fieldname}</div> 
-        {$fieldcount}
-    </div>'),
-        'sid'		=> '-2',
-        'dateline'	=> TIME_NOW
-    );
-    $db->insert_query("templates", $insert_array);
-
-    $insert_array = array(
-        'title'		=> 'playerdirectory_playerstat_ownstat_pie',
-        'template'	=> $db->escape_string('<div class="playerdirectory_playerstat_ownstat_headline">{$statisticname}</div>
-        <div class="playerdirectory_playerstat_ownstat_chart">
-            <canvas id="{$chartname}"></canvas>
-        </div>
-        
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
-        <script>
-            var style = getComputedStyle(document.body);
-            var text = style.getPropertyValue(\'--chart-text\');
-            {$propertyValue}
-            // data define for bar chart
-            var myData = {
-                labels: {$labels_chart},
-                datasets: [{
-                    data: {$data_chart},
-                    backgroundColor: {$backgroundColor},
-                    borderWidth: 0
-                }]
-            };
-            // Options define for display value on top of bars
-            var myoption = {
-                maintainAspectRatio: false,
-                legend: {
-                    display: {$legend},
-                    position: \'right\',
-                    labels: {
-                        fontColor: text,
-                        fontSize: 12
-                    },
-                },
-                responsive: true,
-            };
-            // Code to draw Chart
-            var ctx = document.getElementById(\'{$chartname}\').getContext(\'2d\');
-            var myChart = new Chart(ctx, {
-                type: \'pie\', // Define chart type
-                data: myData, // Chart data
-                options: myoption // Chart Options [This is optional paramenter use to add some extra things in the chart].
-            });
-        </script>'),
-        'sid'		=> '-2',
-        'dateline'	=> TIME_NOW
-    );
-    $db->insert_query("templates", $insert_array);
-
-    $insert_array = array(
-        'title'		=> 'playerdirectory_postactivity_months',
-        'template'	=> $db->escape_string('<div class="playerdirectory_postactivity_months_headline">{$lang->playerdirectory_postactivity_months}</div>
-        <div class="playerdirectory_postactivity_months">
-            <div class="playerdirectory_postactivity_months_poststat">
-                {$months_bit}
-            </div>
-        </div>'),
-        'sid'		=> '-2',
-        'dateline'	=> TIME_NOW
-    );
-    $db->insert_query("templates", $insert_array);
-
-    $insert_array = array(
-        'title'		=> 'playerdirectory_postactivity_months_bit',
-        'template'	=> $db->escape_string('<div class="playerdirectory_postactivity_months_month">
-        <div class="playerdirectory_postactivity_months_monthname">{$month_name}</div> 
-        {$allmonthposts_formatted}    
-    </div>'),
-        'sid'		=> '-2',
-        'dateline'	=> TIME_NOW
-    );
-    $db->insert_query("templates", $insert_array);
-
-    $insert_array = array(
-        'title'		=> 'playerdirectory_postactivity_months_chart',
-        'template'	=> $db->escape_string('<div class="playerdirectory_postactivity_months_headline">{$lang->playerdirectory_postactivity_months}</div>
-        <div class="playerdirectory_postactivity_months_chart">
-            <canvas id="postactivityChart"></canvas>
-        </div>
-        
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
-        <script>
-            var style = getComputedStyle(document.body);
-            var accent = style.getPropertyValue(\'--chart-primary\');
-            var text = style.getPropertyValue(\'--chart-text\');
-            // data define for bar chart
-            var myData = {
-                labels: {$labels_chart},
-                datasets: [{
-                    backgroundColor: accent,
-                    hoverBackgroundColor: accent,
-                    data: {$data_chart}
-                }]
-            };
-            // Options define for display value on top of bars
-            var myoption = {
-                maintainAspectRatio: false,
-                legend: {
-                    "display": false
-                },
-                tooltips: {
-                    enabled: true,
-                },
-                hover: {
-                    animationDuration: 1
-                },
-                animation: {
-                    duration: 1,
-                    onComplete: function () {
-                        var chartInstance = this.chart,
-                            ctx = chartInstance.ctx;
-                        ctx.textAlign = \'center\';
-                        ctx.fillStyle = text;
-                        ctx.textBaseline = \'bottom\';
-                        // Loop through each data in the datasets
-                        this.data.datasets.forEach(function (dataset, i) {
-                            var meta = chartInstance.controller.getDatasetMeta(i);
-                            meta.data.forEach(function (bar, index) {
-                                var data = dataset.data[index];
-                                ctx.fillText(data, bar._model.x, bar._model.y - 5);
-                            });
-                        });
-                    }
-                },
-                scales: {
-                    yAxes: [{
-                        display: true,
-                        gridLines: {
-                            display: false
-                        },
-                        ticks: {
-                            max: {$maxCount},
-                            display: false,
-                            beginAtZero: true,
-                            color: accent
-                        }
-                    }],
-                    xAxes: [{
-                        gridLines: {
-                            display: false
-                        },
-                        ticks: {
-                            beginAtZero: true,
-                            fontColor: text
-                        }
-                    }]
-                }
-            };
-            // Code to draw Chart
-            var ctx = document.getElementById(\'postactivityChart\').getContext(\'2d\');
-            var myChart = new Chart(ctx, {
-                type: \'bar\', // Define chart type
-                data: myData, // Chart data
-                options: myoption // Chart Options [This is optional paramenter use to add some extra things in the chart].
-            });
-        </script>'),
-        'sid'		=> '-2',
-        'dateline'	=> TIME_NOW
-    );
-    $db->insert_query("templates", $insert_array);
-
-    $insert_array = array(
-        'title'		=> 'playerdirectory_postactivity_perChara',
-        'template'	=> $db->escape_string('<div class="playerdirectory_postactivity_perChara">
-        {$postactivity_scenestat}
-        {$postactivity_poststat}
-    </div>'),
-        'sid'		=> '-2',
-        'dateline'	=> TIME_NOW
-    );
-    $db->insert_query("templates", $insert_array);
-
-    $insert_array = array(
-        'title'		=> 'playerdirectory_postactivity_perChara_poststat',
-        'template'	=> $db->escape_string('<div class="playerdirectory_postactivity_perChara_stat">
-        <div class="playerdirectory_postactivity_perChara_headline">{$lang->playerdirectory_postactivity_perChara_poststat}</div>
-        {$poststat_bit}
-    </div>'),
-        'sid'		=> '-2',
-        'dateline'	=> TIME_NOW
-    );
-    $db->insert_query("templates", $insert_array);
-
-    $insert_array = array(
-        'title'		=> 'playerdirectory_postactivity_perChara_poststat_bit',
-        'template'	=> $db->escape_string('<div class="playerdirectory_postactivity_perChara_bit_chara">
-        <div class="playerdirectory_postactivity_perChara_bit_charactername">{$first_name}<br>{$last_name}</div> 
-        {$postcount_formatted} Posts
-    </div>'),
-        'sid'		=> '-2',
-        'dateline'	=> TIME_NOW
-    );
-    $db->insert_query("templates", $insert_array);
-
-    $insert_array = array(
-        'title'		=> 'playerdirectory_postactivity_perChara_poststat_chart_bar',
-        'template'	=> $db->escape_string('<div class="playerdirectory_postactivity_perChara_chart">
-        <canvas id="poststatChart"></canvas>
-        </div>
-    
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
-        <script>
-        var style = getComputedStyle(document.body);
-        var text = style.getPropertyValue(\'--chart-text\');
-        // data define for bar chart
-        var myData = {
-            labels: {$labels_chart},
-            datasets: [{
-                backgroundColor: {$backgroundColor},
-                data: {$data_chart}
-            }]
-        };
-        // Options define for display value on top of bars
-        var myoption = {
-            maintainAspectRatio: false,
-            legend: {
-                "display": false
-            },
-            responsive: true,
-            tooltips: {
-                enabled: true,
-            },
-            hover: {
-                animationDuration: 1
-            },
-            animation: {
-                duration: 1,
-                onComplete: function () {
-                    var chartInstance = this.chart,
-                        ctx = chartInstance.ctx;
-                    ctx.textAlign = \'center\';
-                    ctx.fillStyle = text;
-                    ctx.textBaseline = \'bottom\';
-                    // Loop through each data in the datasets
-                    this.data.datasets.forEach(function (dataset, i) {
-                        var meta = chartInstance.controller.getDatasetMeta(i);
-                        meta.data.forEach(function (bar, index) {
-                            var data = dataset.data[index];
-                            ctx.fillText(data, bar._model.x, bar._model.y - 5);
-                        });
-                    });
-                }
-            },
-            scales: {
-                yAxes: [{
-                    display: true,
-                    gridLines: {
-                        display: false
-                    },
-                    ticks: {
-                        max: {$maxCount},
-                        display: false,
-                        beginAtZero: true,
-                        color: accent
-                    }
-                }],
-                xAxes: [{
-                    gridLines: {
-                        display: false
-                    },
-                    ticks: {
-                        beginAtZero: true,
-                        fontColor: text
-                    }
-                }]
-            }
-        };
-        // Code to draw Chart
-        var ctx = document.getElementById(\'poststatChart\').getContext(\'2d\');
-        var myChart = new Chart(ctx, {
-            type: \'bar\', // Define chart type
-            data: myData, // Chart data
-            options: myoption // Chart Options [This is optional paramenter use to add some extra things in the chart].
-        });
-    </script>'),
-        'sid'		=> '-2',
-        'dateline'	=> TIME_NOW
-    );
-    $db->insert_query("templates", $insert_array);
-
-    $insert_array = array(
-        'title'		=> 'playerdirectory_postactivity_perChara_poststat_chart_pie',
-        'template'	=> $db->escape_string('<div class="playerdirectory_postactivity_perChara_chart">
-        <canvas id="poststatChart"></canvas>  
-        </div>
-
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
-        <script>
-        var style = getComputedStyle(document.body);
-        var text = style.getPropertyValue(\'--chart-text\');
-        // data define for bar chart
-        var myData = {
-            labels: {$labels_chart},
-            datasets: [{
-                data: {$data_chart},
-                backgroundColor: {$backgroundColor},
-                borderColor: {$backgroundColor},
-                borderWidth: 0
-            }]
-        };
-        // Options define for display value on top of bars
-        var myoption = {
-            maintainAspectRatio: false,
-            legend: {
-                display: {$legend},
-                position: \'right\',
-                labels: {
-                        fontColor: text,
-                    fontSize: 12
-                    },
-            },
-            tooltips: {
-                enabled: true,
-            },
-            responsive: true,
-        };
-        // Code to draw Chart
-        var ctx = document.getElementById(\'poststatChart\').getContext(\'2d\');
-        var myChart = new Chart(ctx, {
-            type: \'pie\', // Define chart type
-            data: myData, // Chart data
-            options: myoption // Chart Options [This is optional paramenter use to add some extra things in the chart].
-        });
-    </script>'),
-        'sid'		=> '-2',
-        'dateline'	=> TIME_NOW
-    );
-    $db->insert_query("templates", $insert_array);
-
-    $insert_array = array(
-        'title'		=> 'playerdirectory_postactivity_perChara_scenestat',
-        'template'	=> $db->escape_string('<div class="playerdirectory_postactivity_perChara_stat">
-        <div class="playerdirectory_postactivity_perChara_headline">{$lang->playerdirectory_postactivity_perChara_scenestat}</div>
-        {$scenestat_bit}
-    </div>'),
-        'sid'		=> '-2',
-        'dateline'	=> TIME_NOW
-    );
-    $db->insert_query("templates", $insert_array);
-
-    $insert_array = array(
-        'title'		=> 'playerdirectory_postactivity_perChara_scenestat_bit',
-        'template'	=> $db->escape_string('<div class="playerdirectory_postactivity_perChara_bit_chara">
-        <div class="playerdirectory_postactivity_perChara_bit_charactername">{$first_name}<br>{$last_name}</div> 
-        {$scenecount_formatted} Szenen
-    </div>'),
-        'sid'		=> '-2',
-        'dateline'	=> TIME_NOW
-    );
-    $db->insert_query("templates", $insert_array);
-
-    $insert_array = array(
-        'title'		=> 'playerdirectory_postactivity_perChara_scenestat_chart_bar',
-        'template'	=> $db->escape_string('<div class="playerdirectory_postactivity_perChara_chart">
-        <canvas id="scenestatChart"></canvas>
-        </div>
-     
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
-        <script>
-        var style = getComputedStyle(document.body);
-        var text = style.getPropertyValue(\'--chart-text\');
-        // data define for bar chart
-        var myData = {
-            labels: {$labels_chart},
-            datasets: [{
-                backgroundColor: {$backgroundColor},
-                data: {$data_chart}
-            }]
-        };
-        // Options define for display value on top of bars
-        var myoption = {
-            maintainAspectRatio: false,
-            legend: {
-                "display": false
-            },
-            responsive: true,
-            tooltips: {
-                enabled: true
-            },
-            hover: {
-                animationDuration: 1
-            },
-            animation: {
-                duration: 1,
-                onComplete: function () {
-                    var chartInstance = this.chart,
-                        ctx = chartInstance.ctx;
-                    ctx.textAlign = \'center\';
-                    ctx.fillStyle = text;
-                    ctx.textBaseline = \'bottom\';
-                    // Loop through each data in the datasets
-                    this.data.datasets.forEach(function (dataset, i) {
-                        var meta = chartInstance.controller.getDatasetMeta(i);
-                        meta.data.forEach(function (bar, index) {
-                            var data = dataset.data[index];
-                            ctx.fillText(data, bar._model.x, bar._model.y - 5);
-                        });
-                    });
-                }
-            },
-            scales: {
-                yAxes: [{
-                    display: true,
-                    gridLines: {
-                        display: false
-                    },
-                    ticks: {
-                        max: {$maxCount},
-                        display: false,
-                        beginAtZero: true,
-                        color: accent
-                    }
-                }],
-                xAxes: [{
-                    gridLines: {
-                        display: false
-                    },
-                    ticks: {
-                        beginAtZero: true,
-                        fontColor: text
-                    }
-                }]
-            }
-        };
-        // Code to draw Chart
-        var ctx = document.getElementById(\'scenestatChart\').getContext(\'2d\');
-        var myChart = new Chart(ctx, {
-            type: \'bar\', // Define chart type
-            data: myData, // Chart data
-            options: myoption // Chart Options [This is optional paramenter use to add some extra things in the chart].
-        });
-    </script>'),
-        'sid'		=> '-2',
-        'dateline'	=> TIME_NOW
-    );
-    $db->insert_query("templates", $insert_array);
-
-    $insert_array = array(
-        'title'		=> 'playerdirectory_postactivity_perChara_scenestat_chart_pie',
-        'template'	=> $db->escape_string('<div class="playerdirectory_postactivity_perChara_chart">
-        <canvas id="scenestatChart"></canvas>
-        </div>
-    
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
-        <script>
-        var style = getComputedStyle(document.body);
-        var text = style.getPropertyValue(\'--chart-text\');
-        // data define for bar chart
-        var myData = {
-            labels: {$labels_chart},
-            datasets: [{
-                data: {$data_chart},
-                backgroundColor: {$backgroundColor},
-                borderColor: {$backgroundColor},
-                borderWidth: 0
-            }]
-        };
-        // Options define for display value on top of bars
-        var myoption = {
-            maintainAspectRatio: false,
-            legend: {
-                display: {$legend},
-                position: \'right\',
-                labels: {
-                        fontColor: text,
-                    fontSize: 12
-                    },
-            },
-            responsive: true,
-        };
-        // Code to draw Chart
-        var ctx = document.getElementById(\'scenestatChart\').getContext(\'2d\');
-        var myChart = new Chart(ctx, {
-            type: \'pie\', // Define chart type
-            data: myData, // Chart data
-            options: myoption // Chart Options [This is optional paramenter use to add some extra things in the chart].
-        });
-    </script>'),
-        'sid'		=> '-2',
-        'dateline'	=> TIME_NOW
-    );
-    $db->insert_query("templates", $insert_array);
-
-    $insert_array = array(
-        'title'		=> 'playerdirectory_usercp_options',
-        'template'	=> $db->escape_string('<fieldset class="trow2">
-        <legend><strong>{$lang->playerdirectory_usercp_options}</strong></legend>
-        <table cellspacing="0" cellpadding="2">
-            {$option_playerstat}
-            {$option_playerstat_guest}
-            {$option_characterstat}
-            {$option_characterstat_guest}
-        </table>
-    </fieldset><br>'),
-        'sid'		=> '-2',
-        'dateline'	=> TIME_NOW
-    );
-    $db->insert_query("templates", $insert_array);
-
-    $insert_array = array(
-        'title'		=> 'playerdirectory_usercp_options_bit',
-        'template'	=> $db->escape_string('<tr>
-        <td valign="top" width="1">
-            <input type="checkbox" class="checkbox" name="{$nameID}" id="{$nameID}" value="1" {$checked} />
-        </td>
-        <td>
-            <span class="smalltext">
-                <label for="{$nameID}">{$option_text}</label>
-            </span>
-        </td>
-    </tr>'),
-        'sid'		=> '-2',
-        'dateline'	=> TIME_NOW
-    );
-    $db->insert_query("templates", $insert_array);
-    
-
-    require_once MYBB_ADMIN_DIR."inc/functions_themes.php";
+    playerdirectory_templates();
 
     // STYLESHEET HINZUFÜGEN
-    $css = array(
-        'name' => 'playerdirectory.css',
-        'tid' => 1,
-        'attachedto' => '',
-        "stylesheet" => ':root {	
-            --chart-primary: #0066a2;
-            --chart-text: #000;
-        }
-        
-        /* SPIELERVERZEICHNIS */
-        
-        .playerdirectory_directory {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: flex-start;
-            gap: 10px;
-            align-items: flex-start;
-        }
-        
-        .playerdirectory_user {
-            width: 32.8%;
-        }
-        
-        .playerdirectory_headline {
-            background: #0066a2 url(../../../images/thead.png) top left repeat-x;
-            color: #ffffff;
-            padding: 8px;
-            font-weight: bold;
-        }
-        
-        .playerdirectory_subline {
-            background: #0f0f0f url(../../../images/tcat.png) repeat-x;
-            color: #fff;
-            border-top: 1px solid #444;
-            border-bottom: 1px solid #000;
-            padding: 6px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        
-        .playerdirectory_user_information {
-            padding: 5px 0;
-        }
-        
-        .playerdirectory_user_information_item {
-            padding: 1px 0;
-        }
-        
-        .playerdirectory_user_accounts {
-            height: 200px;
-            overflow: auto;
-            padding-top: 10px;
-        }
-        
-        .directory_characters {
-            display: flex;
-            width: 100%;
-            margin-bottom: 5px;
-            flex-wrap: nowrap;
-            align-items: flex-start;
-            justify-content: flex-start;
-            gap: 10px;
-        }
-        
-        .directory_characters_avatar {
-            width: 15%;
-        }
-        
-        .directory_characters_avatar img {
-            width: 100%;
-        }
-        
-        .directory_characters_fact {
-            padding-top: 3px;
-        }
-        
-        /* SPIELERSTATISTIK */
-        
-        .playerdirectory_playerstat_statistic {
-            display: flex;
-            flex-flow: wrap;
-            margin: 10px 0;
-        }
-        
-        .playerdirectory_playerstat_stat {
-            width: calc(100% / 4);
-            display: flex;
-            flex-flow: column;
-            padding: 10px 5px;
-            box-sizing: border-box;
-            justify-content: flex-start;
-            align-items: center;
-        }
-        
-        .playerdirectory_playerstat_question {
-            color: #333;
-            font-size: small;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-        
-        .playerdirectory_playerstat_answer {
-            text-align: center;
-        }
-        
-        .playerdirectory_playerstat_characters {
-            display: flex;
-            justify-content: flex-start;
-            flex-wrap: nowrap;
-            gap: 10px;
-            width: 100%;
-            margin-bottom: 10px;
-        }
-        
-        .playerdirectory_playerstat_avatar {
-            width: 10%;
-        }
-        
-        .playerdirectory_playerstat_avatar img {
-            width: 100%;
-        }
-        
-        .playerdirectory_playerstat_infos {
-            width: 90%;
-        }
-        
-        .playerdirectory_playerstat_username {
-            background: #0066a2 url(../../../images/thead.png) top left repeat-x;
-            color: #ffffff;
-            padding: 8px;
-            font-weight: bold;
-        }
-        
-        .playerdirectory_playerstat_usertitle {
-            background: #0f0f0f url(../../../images/tcat.png) repeat-x;
-            color: #fff;
-            border-top: 1px solid #444;
-            border-bottom: 1px solid #000;
-            padding: 6px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        
-        .playerdirectory_playerstat_username a:link,
-        .playerdirectory_playerstat_username a:visited,
-        .playerdirectory_playerstat_username a:active,
-        .playerdirectory_playerstat_username a:hover {
-            color: #ffffff;
-        }
-        
-        /* CHARAKTERSTATISTIK */
-        
-        .playerdirectory_characterstat_statistic {
-            display: flex;
-            flex-flow: wrap;
-            margin: 10px 0;
-        }
-        
-        .playerdirectory_characterstat_stat {
-            width: calc(100% / 4);
-            display: flex;
-            flex-flow: column;
-            padding: 10px 5px;
-            box-sizing: border-box;
-            justify-content: flex-start;
-            align-items: center;
-        }
-        
-        .playerdirectory_characterstat_question {
-            color: #333;
-            font-size: small;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-        
-        .playerdirectory_characterstat_answer {
-            text-align: center;
-        }
-        
-        .playerdirectory_characterstat_characters {
-            display: flex;
-            justify-content: flex-start;
-            flex-wrap: nowrap;
-            gap: 10px;
-            width: 100%;
-            margin-bottom: 10px;
-        }
-        
-        .playerdirectory_characterstat_avatar {
-            width: 10%;
-        }
-        
-        .playerdirectory_characterstat_avatar img {
-            width: 100%;
-        }
-        
-        .playerdirectory_characterstat_infos {
-            width: 90%;
-        }
-        
-        .playerdirectory_characterstat_username {
-            background: #0066a2 url(../../../images/thead.png) top left repeat-x;
-            color: #ffffff;
-            padding: 8px;
-            font-weight: bold;
-        }
-        
-        .playerdirectory_characterstat_usertitle {
-            background: #0f0f0f url(../../../images/tcat.png) repeat-x;
-            color: #fff;
-            border-top: 1px solid #444;
-            border-bottom: 1px solid #000;
-            padding: 6px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        
-        .playerdirectory_characterstat_username a:link,
-        .playerdirectory_characterstat_username a:visited,
-        .playerdirectory_characterstat_username a:active,
-        .playerdirectory_characterstat_username a:hover {
-            color: #ffffff;
-        }
-        
-        /* INPLAYZITATET */
-        
-        .playerdirectory_inplayquote {
-            width: 100%;
-            display: flex;
-            margin: 10px 0;
-            flex-wrap: nowrap;
-            align-items: center;
-        }
-        
-        .playerdirectory_inplayquote_avatar {
-            width: 10%;
-            text-align: center;
-        }
-        
-        .playerdirectory_inplayquote_avatar img {
-            border-radius: 100%;
-            border: 2px solid #0071bd;
-            width: 100px;
-        }
-        
-        .playerdirectory_inplayquote_container {
-            width: 90%;
-        }
-        
-        .playerdirectory_quote {
-            width: 95%;
-            margin: auto;
-            font-size: 15px;
-            text-align: justify;
-            margin-bottom: 10px;
-        }
-        
-        .playerdirectory_quote_user {
-            text-align: right;
-        }
-        
-        .playerdirectory_quote_user b {
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-size: 13px;
-        }
-        
-        .playerdirectory_quote_user span {
-            font-style: italic;
-            font-size: 11px;
-        }
-        
-        /* 12 MONATE STATISTIK */
-        
-        .playerdirectory_postactivity_months_headline {
-            margin-bottom: 5px;
-            color: #333;
-            font-size: small;
-            font-weight: bold;
-            text-transform: uppercase;
-            text-align: center;
-            width: 100%;
-        }
-        
-        .playerdirectory_postactivity_months {
-            width: 100%;
-            text-align: center;
-            margin: 10px 10px;
-        }
-        
-        .playerdirectory_postactivity_months_poststat {
-            width: 100%;
-            display: flex;
-            flex-flow: wrap;
-            flex-wrap: nowrap;
-            justify-content: space-between;
-        }
-        
-        .playerdirectory_postactivity_months_month {
-            justify-content: center;
-            align-items: center;
-            display: flex;
-            flex-flow: column;
-        }
-        
-        .playerdirectory_postactivity_months_monthname {
-            color: #293340;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-        
-        .playerdirectory_postactivity_months_chart {
-            height: 250px;
-            width: 100%;
-        }
-        
-        /* PRO CHARAKTER */
-        
-        .playerdirectory_postactivity_perChara {
-            text-align: center;
-            margin: 10px 10px;
-            display: flex;
-            justify-content: space-around;
-            align-content: flex-start;
-            flex-wrap: nowrap;
-        }
-        
-        .playerdirectory_postactivity_perChara_stat {
-            width: 50%;
-            text-align: center;
-        }
-        
-        .playerdirectory_postactivity_perChara_headline {
-            margin-bottom: 5px;
-            color: #333;
-            font-size: small;
-            font-weight: bold;
-            text-transform: uppercase;
-            text-align: center;
-            width: 100%;
-        }
-        
-        .playerdirectory_postactivity_perChara_bit {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-            height: 150px;
-            align-items: center;
-        }
-        
-        .playerdirectory_postactivity_perChara_bit_chara {
-            justify-content: center;
-            align-items: center;
-            display: flex;
-            flex-flow: column;
-        }
-        
-        .playerdirectory_postactivity_perChara_bit_charactername {
-            color: #293340;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-        
-        .playerdirectory_postactivity_perChara_chart {
-            height: 150px;
-            width: 100%;
-        }
-        
-        /* EIGENE STATISTIKEN */
-        
-        .playerdirectory_playerstat_ownstat_headline {
-            margin-bottom: 5px;
-            color: #333;
-            font-size: small;
-            font-weight: bold;
-            text-transform: uppercase;
-            text-align: center;
-            width: 100%;
-        }
-        
-        .playerdirectory_playerstat_ownstat_bit {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-            align-items: center;
-        }
-        
-        .playerdirectory_playerstat_ownstat_bit_option {
-            justify-content: center;
-            align-items: center;
-            display: flex;
-            flex-flow: column;
-        }
-        
-        .playerdirectory_playerstat_ownstat_bit_optionname {
-            color: #293340;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-        
-        .playerdirectory_playerstat_ownstat_chart {
-            height: 150px;
-            width: 100%;
-        }',
-        'cachefile' => $db->escape_string(str_replace('/', '', 'playerdirectory.css')),
-        'lastmodified' => time()
-    );
-    
+	require_once MYBB_ADMIN_DIR."inc/functions_themes.php";
+    // Funktion
+    $css = playerdirectory_stylesheet();
     $sid = $db->insert_query("themestylesheets", $css);
-    $db->update_query("themestylesheets", array("cachefile" => "playerdirectory.css"), "sid = '".$sid."'", 1);
+	$db->update_query("themestylesheets", array("cachefile" => "playerdirectory.css"), "sid = '".$sid."'", 1);
 
-    $tids = $db->simple_select("themes", "tid");
-    while($theme = $db->fetch_array($tids)) {
-        update_theme_stylesheet_list($theme['tid']);
-    }
+	$tids = $db->simple_select("themes", "tid");
+	while($theme = $db->fetch_array($tids)) {
+		update_theme_stylesheet_list($theme['tid']);
+	}  
 }
  
 // Funktion zur Überprüfung des Installationsstatus; liefert true zurürck, wenn Plugin installiert, sonst false (optional).
@@ -1798,12 +191,12 @@ function playerdirectory_deactivate(){
 
 // ADMIN BEREICH - KONFIGURATION //
 // action handler fürs acp konfigurieren
-function playerdirectory_admin_user_action_handler(&$actions) {
+function playerdirectory_admin_rpgstuff_action_handler(&$actions) {
 	$actions['playerdirectory'] = array('active' => 'playerdirectory', 'file' => 'playerdirectory');
 }
 
 // Berechtigungen im ACP - Adminrechte
-function playerdirectory_admin_user_permissions(&$admin_permissions) {
+function playerdirectory_admin_rpgstuff_permissions(&$admin_permissions) {
 	global $lang;
 	
     $lang->load('playerdirectory');
@@ -1814,7 +207,7 @@ function playerdirectory_admin_user_permissions(&$admin_permissions) {
 }
 
 // Menü einfügen
-function playerdirectory_admin_user_menu(&$sub_menu) {
+function playerdirectory_admin_rpgstuff_menu(&$sub_menu) {
 	global $mybb, $lang;
 	
     $lang->load('playerdirectory');
@@ -1822,7 +215,7 @@ function playerdirectory_admin_user_menu(&$sub_menu) {
 	$sub_menu[] = [
 		"id" => "playerdirectory",
 		"title" => $lang->playerdirectory_manage,
-		"link" => "index.php?module=user-playerdirectory"
+		"link" => "index.php?module=rpgstuff-playerdirectory"
 	];
 }
 
@@ -1882,9 +275,9 @@ function playerdirectory_admin_manage() {
 	}
 
 	// Add to page navigation
-	$page->add_breadcrumb_item($lang->playerdirectory_manage, "index.php?module=user-playerdirectory");
+	$page->add_breadcrumb_item($lang->playerdirectory_manage, "index.php?module=rpgstuff-playerdirectory");
 
-	if ($run_module == 'user' && $action_file == 'playerdirectory') {
+	if ($run_module == 'rpgstuff' && $action_file == 'playerdirectory') {
 
         // ÜBERSICHT
 		if ($mybb->get_input('action') == "" || !$mybb->get_input('action')) {
@@ -1895,15 +288,17 @@ function playerdirectory_admin_manage() {
 			// Übersichtsseite Button
 			$sub_tabs['playerdirectory'] = [
 				"title" => $lang->playerdirectory_manage_overview,
-				"link" => "index.php?module=user-playerdirectory",
+				"link" => "index.php?module=rpgstuff-playerdirectory",
 				"description" => $lang->playerdirectory_manage_overview_desc
 			];
-			// Hinzufüge Button
-			$sub_tabs['playerdirectory_add'] = [
-				"title" => $lang->playerdirectory_manage_add,
-				"link" => "index.php?module=user-playerdirectory&amp;action=add",
-				"description" => $lang->playerdirectory_manage_add_desc
-			];
+            if($playerstat_activated == 1){
+                // Hinzufüge Button
+                $sub_tabs['playerdirectory_add'] = [
+                    "title" => $lang->playerdirectory_manage_add,
+                    "link" => "index.php?module=rpgstuff-playerdirectory&amp;action=add",
+                    "description" => $lang->playerdirectory_manage_add_desc
+                ];
+            }
 
 			$page->output_nav_tabs($sub_tabs, 'playerdirectory');
 
@@ -1913,7 +308,7 @@ function playerdirectory_admin_manage() {
 			}
             
 			// Übersichtsseite
-			$form = new Form("index.php?module=user-playerdirectory", "post", "", 1);
+			$form = new Form("index.php?module=rpgstuff-playerdirectory", "post", "", 1);
 			$form_container = new FormContainer($lang->playerdirectory_manage_overview);
 
             // Spielerstatistiken muss aktiviert sein
@@ -2065,7 +460,7 @@ function playerdirectory_admin_manage() {
                     }
 
                     // AUSGABE DER INFOS
-                    $form_container->output_cell("<strong><span style=\"font-size:0.9rem;\"><a href=\"index.php?module=user-playerdirectory&action=edit&psid=".$stat['psid']."\">".htmlspecialchars_uni($stat['name'])."</a></span></strong> 
+                    $form_container->output_cell("<strong><span style=\"font-size:0.9rem;\"><a href=\"index.php?module=rpgstuff-playerdirectory&action=edit&psid=".$stat['psid']."\">".htmlspecialchars_uni($stat['name'])."</a></span></strong> 
                     ".$lang->sprintf($lang->playerdirectory_manage_overview_stat_variable, $stat['identification'])."<br />
                     ".$lang->sprintf($lang->playerdirectory_manage_overview_stat_presentation, $type)."</br>
                     ".$dataoption."
@@ -2076,11 +471,11 @@ function playerdirectory_admin_manage() {
                     $popup = new PopupMenu("playerdirectory_".$stat['psid'], $lang->playerdirectory_manage_overview_options);	
                     $popup->add_item(
                         $lang->playerdirectory_manage_overview_options_edit,
-                        "index.php?module=user-playerdirectory&amp;action=edit&amp;psid=".$stat['psid']
+                        "index.php?module=rpgstuff-playerdirectory&amp;action=edit&amp;psid=".$stat['psid']
                     );
                     $popup->add_item(
                         $lang->playerdirectory_manage_overview_options_delete,
-                        "index.php?module=user-playerdirectory&amp;action=delete&amp;psid=".$stat['psid']."&amp;my_post_key={$mybb->post_code}", 
+                        "index.php?module=rpgstuff-playerdirectory&amp;action=delete&amp;psid=".$stat['psid']."&amp;my_post_key={$mybb->post_code}", 
                         "return AdminCP.deleteConfirmation(this, '".$lang->playerdirectory_manage_overview_delete_notice."')"
                     );
                 
@@ -2096,7 +491,7 @@ function playerdirectory_admin_manage() {
 
             } else {
                 $setting_gid = $db->fetch_field($db->simple_select("settinggroups", "gid", "name = 'playerdirectory'"), "gid");
-                $form_container->output_cell($lang->sprintf($lang->playerdirectory_manage_overview_stat_color, $setting_gid), array("colspan" => 2));
+                $form_container->output_cell($lang->sprintf($lang->playerdirectory_manage_playerstat_deactivated, $setting_gid), array("colspan" => 2));
                 $form_container->construct_row();
             } 
 
@@ -2306,7 +701,7 @@ function playerdirectory_admin_manage() {
                     log_admin_action(htmlspecialchars_uni($mybb->input['name']));
     
                     flash_message($lang->playerdirectory_manage_add_flash, 'success');
-                    admin_redirect("index.php?module=user-playerdirectory");
+                    admin_redirect("index.php?module=rpgstuff-playerdirectory");
                 }
             }
     
@@ -2341,13 +736,13 @@ function playerdirectory_admin_manage() {
             // Übersichtsseite Button
 			$sub_tabs['playerdirectory'] = [
 				"title" => $lang->playerdirectory_manage_overview,
-				"link" => "index.php?module=user-playerdirectory",
+				"link" => "index.php?module=rpgstuff-playerdirectory",
 				"description" => $lang->playerdirectory_manage_overview_desc
 			];
 			// Hinzufüge Button
 			$sub_tabs['playerdirectory_add'] = [
 				"title" => $lang->playerdirectory_manage_add,
-				"link" => "index.php?module=user-playerdirectory&amp;action=add",
+				"link" => "index.php?module=rpgstuff-playerdirectory&amp;action=add",
 				"description" => $lang->playerdirectory_manage_add_desc
 			];
     
@@ -2428,7 +823,7 @@ function playerdirectory_admin_manage() {
             }
 
             // Build the form
-            $form = new Form("index.php?module=user-playerdirectory&amp;action=add", "post", "", 1);
+            $form = new Form("index.php?module=rpgstuff-playerdirectory&amp;action=add", "post", "", 1);
             $form_container = new FormContainer($lang->playerdirectory_manage_add);
     
             // Name
@@ -2529,7 +924,7 @@ function playerdirectory_admin_manage() {
             $color_options = array(
                 "<small class=\"input\">{$lang->playerdirectory_manage_add_colors_desc}</small><br />".
                 $form->generate_text_area('colors', $mybb->get_input('colors'), array('id' => 'colors')),
-                $form->generate_check_box("custom_properties", 1, $lang->playerdirectory_manage_add_custom_properties, array("checked" => $mybb->input['custom_properties'])),
+                $form->generate_check_box("custom_properties", 1, $lang->playerdirectory_manage_add_custom_properties, array("checked" => $mybb->get_input('custom_properties'))),
             );
             $form_container->output_row(
                 $lang->playerdirectory_manage_add_colors, 
@@ -2766,7 +1161,7 @@ function playerdirectory_admin_manage() {
                     log_admin_action(htmlspecialchars_uni($mybb->input['name']));
     
                     flash_message($lang->playerdirectory_manage_edit_flash, 'success');
-                    admin_redirect("index.php?module=user-playerdirectory");
+                    admin_redirect("index.php?module=rpgstuff-playerdirectory");
                 }
             }
     
@@ -2801,7 +1196,7 @@ function playerdirectory_admin_manage() {
             // Übersichtsseite Button
             $sub_tabs['playerdirectory_edit'] = [
                 "title" => $lang->playerdirectory_manage_edit,
-                "link" => "index.php?module=user-playerdirectory&amp;action=edit&psid=".$psid,
+                "link" => "index.php?module=rpgstuff-playerdirectory&amp;action=edit&psid=".$psid,
                 "description" => $lang->playerdirectory_manage_edit_desc
             ];
     
@@ -2929,7 +1324,7 @@ function playerdirectory_admin_manage() {
             }
     
             // Build the form
-            $form = new Form("index.php?module=user-playerdirectory&amp;action=edit", "post", "", 1);
+            $form = new Form("index.php?module=rpgstuff-playerdirectory&amp;action=edit", "post", "", 1);
             $form_container = new FormContainer($lang->sprintf($lang->playerdirectory_manage_edit_container, $statistic['name']));
             echo $form->generate_hidden_field('psid', $psid);
     
@@ -3057,12 +1452,12 @@ function playerdirectory_admin_manage() {
 			// Error Handling
 			if (empty($psid)) {
 				flash_message($lang->playerdirectory_manage_error_invalid, 'error');
-				admin_redirect("index.php?module=user-playerdirectory");
+				admin_redirect("index.php?module=rpgstuff-playerdirectory");
 			}
 
 			// Cancel button pressed?
 			if (isset($mybb->input['no']) && $mybb->input['no']) {
-				admin_redirect("index.php?module=user-playerdirectory");
+				admin_redirect("index.php?module=rpgstuff-playerdirectory");
 			}
 
 			if ($mybb->request_method == "post") {
@@ -3075,10 +1470,10 @@ function playerdirectory_admin_manage() {
 				log_admin_action(htmlspecialchars_uni($del_type['name']));
 
 				flash_message($lang->playerdirectory_manage_overview_delete_flash, 'success');
-				admin_redirect("index.php?module=user-playerdirectory");
+				admin_redirect("index.php?module=rpgstuff-playerdirectory");
 			} else {
 				$page->output_confirm_action(
-					"index.php?module=user-playerdirectory&amp;action=delete&amp;psid=".$psid,
+					"index.php?module=rpgstuff-playerdirectory&amp;action=delete&amp;psid=".$psid,
 					$lang->playerdirectory_manage_overview_delete_notice
 				);
 			}
@@ -3086,6 +1481,136 @@ function playerdirectory_admin_manage() {
 		}
 
     }
+}
+
+// Stylesheet zum Master Style hinzufügen
+function playerdirectory_admin_update_stylesheet(&$table) {
+
+    global $db, $mybb, $lang;
+	
+    $lang->load('rpgstuff_stylesheet_updates');
+
+    require_once MYBB_ADMIN_DIR."inc/functions_themes.php";
+
+    // HINZUFÜGEN
+    if ($mybb->input['action'] == 'add_master' AND $mybb->get_input('plugin') == "playerdirectory") {
+
+        $css = playerdirectory_stylesheet();
+        
+        $sid = $db->insert_query("themestylesheets", $css);
+        $db->update_query("themestylesheets", array("cachefile" => "playerdirectory.css"), "sid = '".$sid."'", 1);
+    
+        $tids = $db->simple_select("themes", "tid");
+        while($theme = $db->fetch_array($tids)) {
+            update_theme_stylesheet_list($theme['tid']);
+        } 
+
+        flash_message($lang->stylesheets_flash, "success");
+        admin_redirect("index.php?module=rpgstuff-stylesheet_updates");
+    }
+
+    // Zelle mit dem Namen des Themes
+    $table->construct_cell("<b>".htmlspecialchars_uni("Spielerverzeichnis und Statistiken")."</b>", array('width' => '70%'));
+
+    // Ob im Master Style vorhanden
+    $master_check = $db->fetch_field($db->query("SELECT tid FROM ".TABLE_PREFIX."themestylesheets 
+    WHERE name = 'playerdirectory.css' 
+    AND tid = 1
+    "), "tid");
+    
+    if (!empty($master_check)) {
+        $masterstyle = true;
+    } else {
+        $masterstyle = false;
+    }
+
+    if (!empty($masterstyle)) {
+        $table->construct_cell($lang->stylesheets_masterstyle, array('class' => 'align_center'));
+    } else {
+        $table->construct_cell("<a href=\"index.php?module=rpgstuff-stylesheet_updates&action=add_master&plugin=playerdirectory\">".$lang->stylesheets_add."</a>", array('class' => 'align_center'));
+    }
+    
+    $table->construct_row();
+}
+
+// Plugin Update
+function playerdirectory_admin_update_plugin(&$table) {
+
+    global $db, $mybb, $lang;
+	
+    $lang->load('rpgstuff_plugin_updates');
+
+    // UPDATE
+    if ($mybb->input['action'] == 'add_update' AND $mybb->get_input('plugin') == "playerdirectory") {
+
+        // Einstellungen überprüfen => Type = update
+        playerdirectory_settings('update');
+        rebuild_settings();
+
+        // Templates 
+        playerdirectory_templates('update');
+
+        // Stylesheet
+        $update_data = playerdirectory_stylesheet_update();
+        $update_stylesheet = $update_data['stylesheet'];
+        $update_string = $update_data['update_string'];
+        if (!empty($update_string)) {
+
+            // Ob im Master Style die Überprüfung vorhanden ist
+            $masterstylesheet = $db->fetch_field($db->query("SELECT stylesheet FROM ".TABLE_PREFIX."themestylesheets WHERE tid = 1 AND name = 'playerdirectory.css'"), "stylesheet");
+            $pos = strpos($masterstylesheet, $update_string);
+            if ($pos === false) { // nicht vorhanden 
+            
+                $theme_query = $db->simple_select('themes', 'tid, name');
+                while ($theme = $db->fetch_array($theme_query)) {
+        
+                    $stylesheet_query = $db->simple_select("themestylesheets", "*", "name='".$db->escape_string('playerdirectory.css')."' AND tid = ".$theme['tid']);
+                    $stylesheet = $db->fetch_array($stylesheet_query);
+        
+                    if ($stylesheet) {
+
+                        require_once MYBB_ADMIN_DIR."inc/functions_themes.php";
+        
+                        $sid = $stylesheet['sid'];
+            
+                        $updated_stylesheet = array(
+                            "cachefile" => $db->escape_string($stylesheet['name']),
+                            "stylesheet" => $db->escape_string($stylesheet['stylesheet']."\n\n".$update_stylesheet),
+                            "lastmodified" => TIME_NOW
+                        );
+            
+                        $db->update_query("themestylesheets", $updated_stylesheet, "sid='".$sid."'");
+            
+                        if(!cache_stylesheet($theme['tid'], $stylesheet['name'], $updated_stylesheet['stylesheet'])) {
+                            $db->update_query("themestylesheets", array('cachefile' => "css.php?stylesheet=".$sid), "sid='".$sid."'", 1);
+                        }
+            
+                        update_theme_stylesheet_list($theme['tid']);
+                    }
+                }
+            } 
+        }
+
+        // Datenbanktabellen & Felder
+        playerdirectory_database();
+
+        flash_message($lang->plugins_flash, "success");
+        admin_redirect("index.php?module=rpgstuff-plugin_updates");
+    }
+
+    // Zelle mit dem Namen des Themes
+    $table->construct_cell("<b>".htmlspecialchars_uni("Spielerverzeichnis und Statistiken")."</b>", array('width' => '70%'));
+
+    // Überprüfen, ob Update erledigt
+    $update_check = playerdirectory_is_updated();
+
+    if (!empty($update_check)) {
+        $table->construct_cell($lang->plugins_actual, array('class' => 'align_center'));
+    } else {
+        $table->construct_cell("<a href=\"index.php?module=rpgstuff-plugin_updates&action=add_update&plugin=playerdirectory\">".$lang->plugins_update."</a>", array('class' => 'align_center'));
+    }
+    
+    $table->construct_row();
 }
 
 // ADMIN-CP PEEKER
@@ -3664,7 +2189,7 @@ function playerdirectory_misc(){
                         $sceneTIDs .= $allcharscenes['tid'].",";
                     }
                 }
-                // Inplaytracker von Ales
+                // Inplaytracker 1.0 von Ales
                 else if ($inplaytrackersystem == 4) {
                     $sceneTIDs = "";
                     $scene_username = "";
@@ -3672,6 +2197,22 @@ function playerdirectory_misc(){
                     // Szenen des Users auslesen - TID
                     $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
                     WHERE (concat(', ',spieler,',') LIKE '%, ".$scene_username.",%')
+                    ORDER by tid ASC                
+                    ");     
+    
+                    while ($allcharscenes = $db->fetch_array($query_allcharscenes)){
+                        // Mit Infos füllen
+                        $sceneTIDs .= $allcharscenes['tid'].",";
+                    } 
+                }
+                // Inplaytracker 2.0 von Ales
+                else if ($inplaytrackersystem == 5) {
+                    $sceneTIDs = "";
+                    $scene_username = "";
+                    $scene_username = get_user($characterID)['username'];
+                    // Szenen des Users auslesen - TID
+                    $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
+                    WHERE (concat(',',charas,',') LIKE '%, ".$scene_username.",%')
                     ORDER by tid ASC                
                     ");     
     
@@ -4041,7 +2582,7 @@ function playerdirectory_misc(){
                     }    
                 }
             } 
-            // Inplaytracker von Ales
+            // Inplaytracker 1.0 von Ales
             else if ($inplaytrackersystem == 4) {
                 $sceneTIDs = "";
                 $scene_username = "";
@@ -4050,6 +2591,24 @@ function playerdirectory_misc(){
                     // Szenen des Users auslesen - TID
                     $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
                     WHERE (concat(', ',spieler,',') LIKE '%, ".$scene_username.",%')
+                    ORDER by tid ASC    
+                    ");     
+
+                    while ($allcharscenes = $db->fetch_array($query_allcharscenes)){
+                        // Mit Infos füllen
+                        $sceneTIDs .= $allcharscenes['tid'].",";
+                    }   
+                }
+            }
+            // Inplaytracker 2.0 von Ales
+            else if ($inplaytrackersystem == 5) {
+                $sceneTIDs = "";
+                $scene_username = "";
+                foreach ($userids_array as $userID) {
+                    $scene_username = get_user($userID)['username'];
+                    // Szenen des Users auslesen - TID
+                    $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
+                    WHERE (concat(',',charas,',') LIKE '%, ".$scene_username.",%')
                     ORDER by tid ASC    
                     ");     
 
@@ -4592,7 +3151,7 @@ function playerdirectory_misc(){
                     $sceneTIDs .= $allcharscenes['tid'].",";
                 }
             }
-            // Inplaytracker von Ales
+            // Inplaytracker 1.0 von Ales
             else if ($inplaytrackersystem == 4) {
                 $sceneTIDs = "";
                 $scene_username = "";
@@ -4600,6 +3159,22 @@ function playerdirectory_misc(){
                 // Szenen des Users auslesen - TID
                 $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
                 WHERE (concat(', ',spieler,',') LIKE '%, ".$scene_username.",%')
+                ORDER by tid ASC                
+                ");     
+
+                while ($allcharscenes = $db->fetch_array($query_allcharscenes)){
+                    // Mit Infos füllen
+                    $sceneTIDs .= $allcharscenes['tid'].",";
+                } 
+            }
+            // Inplaytracker 2.0 von Ales
+            else if ($inplaytrackersystem == 5) {
+                $sceneTIDs = "";
+                $scene_username = "";
+                $scene_username = get_user($charaID)['username'];
+                // Szenen des Users auslesen - TID
+                $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
+                WHERE (concat(',',charas,',') LIKE '%, ".$scene_username.",%')
                 ORDER by tid ASC                
                 ");     
 
@@ -4741,7 +3316,7 @@ function playerdirectory_misc(){
                 }    
             }
         } 
-        // Inplaytracker von Ales
+        // Inplaytracker 1.0 von Ales
         else if ($inplaytrackersystem == 4) {
             $sceneTIDs = "";
             $scene_username = "";
@@ -4750,6 +3325,24 @@ function playerdirectory_misc(){
                 // Szenen des Users auslesen - TID
                 $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
                 WHERE (concat(', ',spieler,',') LIKE '%, ".$scene_username.",%')
+                ORDER by tid ASC
+                ");     
+
+                while ($allcharscenes = $db->fetch_array($query_allcharscenes)){
+                    // Mit Infos füllen
+                    $sceneTIDs .= $allcharscenes['tid'].",";
+                }   
+            }
+        }
+        // Inplaytracker 2.0 von Ales
+        else if ($inplaytrackersystem == 5) {
+            $sceneTIDs = "";
+            $scene_username = "";
+            foreach ($userids_array as $userID) {
+                $scene_username = get_user($userID)['username'];
+                // Szenen des Users auslesen - TID
+                $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
+                WHERE (concat(',',charas,',') LIKE '%, ".$scene_username.",%')
                 ORDER by tid ASC
                 ");     
 
@@ -6003,7 +4596,7 @@ function playerdirectory_misc(){
                 $sceneTIDs .= $allcharscenes['tid'].",";
             }        
         }
-        // Inplaytracker von Ales
+        // Inplaytracker 1.0 von Ales
         else if ($inplaytrackersystem == 4) {
             $sceneTIDs = "";
             $scene_username = "";
@@ -6011,6 +4604,21 @@ function playerdirectory_misc(){
             // Szenen des Users auslesen - TID
             $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
             WHERE (concat(', ',spieler,',') LIKE '%, ".$scene_username.",%')
+            ORDER by tid ASC                
+            ");     
+            while ($allcharscenes = $db->fetch_array($query_allcharscenes)){
+                // Mit Infos füllen
+                $sceneTIDs .= $allcharscenes['tid'].",";
+            } 
+        }
+        // Inplaytracker 2.0 von Ales
+        else if ($inplaytrackersystem == 5) {
+            $sceneTIDs = "";
+            $scene_username = "";
+            $scene_username = get_user($charaID)['username'];
+            // Szenen des Users auslesen - TID
+            $query_allcharscenes = $db->query("SELECT tid FROM ".TABLE_PREFIX."threads
+            WHERE (concat(',',charas,',') LIKE '%, ".$scene_username.",%')
             ORDER by tid ASC                
             ");     
             while ($allcharscenes = $db->fetch_array($query_allcharscenes)){
@@ -6634,7 +5242,7 @@ function playerdirectory_online_activity($user_activity) {
     global $parameters, $user;
     
     $split_loc = explode(".php", $user_activity['location']);
-    if($split_loc[0] == $user['location']) {
+    if(isset($user['location']) && $split_loc[0] == $user['location']) { 
         $filename = '';
     } else {
         $filename = my_substr($split_loc[0], -my_strpos(strrev($split_loc[0]), "/"));
@@ -6848,19 +5456,19 @@ function playerdirectory_usercp_do_options() {
 
 // HILFSFUNKTION MERDIAN - DURCHSCHNITTLICHES ALTER
 function merdian($array = array()) {
-	$count = count($array);
-	
-    if( $count <= 0 ) {
-		return false;
-	}
-	
+    $count = count($array);
+
+    if ($count <= 0) {
+        return false;
+    }
+
     sort($array, SORT_NUMERIC);
 
-	if( $count % 2 == 0 ) {
-		return ( $array[floor($count/2)-1] + $array[floor($count/2)] ) / 2;
-	} else {
-		return $array[$count/2];
-	}
+    if ($count % 2 == 0) {
+        return ($array[floor($count / 2) - 1] + $array[floor($count / 2)]) / 2;
+    } else {
+        return $array[floor($count / 2)];
+    }
 }
 
 // Variabel Bau Funktion - danke Katja <3
@@ -7147,4 +5755,1748 @@ function playerdirectory_build_statistics($userids_string){
         $array[$arraylabel] = $statistic_typ;  
     }
     return $array;  
+}
+
+// DATENBANKTABELLEN
+function playerdirectory_database() {
+
+    global $db;
+    
+    // DATENBANKEN ERSTELLEN
+    // Kategorien
+    if (!$db->table_exists("playerdirectory_statistics")) {
+        $db->query("CREATE TABLE ".TABLE_PREFIX."playerdirectory_statistics(
+            `psid` int(10) unsigned NOT NULL AUTO_INCREMENT,
+            `name` VARCHAR(500) COLLATE utf8_general_ci NULL,
+            `identification` VARCHAR(500) COLLATE utf8_general_ci NULL,
+            `type` int(1) unsigned NOT NULL,
+            `legend` int(1) unsigned NOT NULL DEFAULT '0',
+            `field` VARCHAR(500) COLLATE utf8_general_ci NULL,
+            `ignor_option` VARCHAR(500) COLLATE utf8_general_ci NULL,
+            `usergroups` VARCHAR(500) COLLATE utf8_general_ci NULL,
+            `group_option` VARCHAR(500) COLLATE utf8_general_ci NULL,
+            `colors` VARCHAR(5000) COLLATE utf8_general_ci NOT NULL,
+            `custom_properties` int(1) unsigned NOT NULL DEFAULT '0',
+            PRIMARY KEY(`psid`),
+            KEY `psid` (`psid`)
+            )
+            ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci AUTO_INCREMENT=1 "
+        );
+    }
+
+    // DATENBANKSPALTE USERS
+    if (!$db->field_exists("playerdirectory_playerstat", "users")) {
+        $db->query("ALTER TABLE `".TABLE_PREFIX."users` ADD `playerdirectory_playerstat` INT(1) NOT NULL DEFAULT '0';");
+    }
+    if (!$db->field_exists("playerdirectory_playerstat_guest", "users")) {
+        $db->query("ALTER TABLE `".TABLE_PREFIX."users` ADD `playerdirectory_playerstat_guest` INT(1) NOT NULL DEFAULT '0';");
+    }
+    if (!$db->field_exists("playerdirectory_characterstat", "users")) {
+        $db->query("ALTER TABLE `".TABLE_PREFIX."users` ADD `playerdirectory_characterstat` INT(1) NOT NULL DEFAULT '0';");
+    }
+    if (!$db->field_exists("playerdirectory_characterstat_guest", "users")) {
+        $db->query("ALTER TABLE `".TABLE_PREFIX."users` ADD `playerdirectory_characterstat_guest` INT(1) NOT NULL DEFAULT '0';");
+    }
+}
+
+// EINSTELLUNGEN
+function playerdirectory_settings($type = 'install') {
+
+    global $db, $lang;
+
+    // SPRACHDATEI
+    $lang->load("playerdirectory", true);
+
+    $setting_array = array(
+		'playerdirectory_directory' => array(
+			'title' => $lang->playerdirectory_setting_directory,
+			'description' => $lang->playerdirectory_setting_directory_desc,
+			'optionscode' => 'yesno',
+			'value' => '0', // Default
+			'disporder' => 1
+		),
+		'playerdirectory_directory_guest' => array(
+			'title' => $lang->playerdirectory_setting_directory_guest,
+			'description' => $lang->playerdirectory_setting_directory_guest_desc,
+			'optionscode' => 'yesno',
+			'value' => '0', // Default
+			'disporder' => 2
+		),
+		'playerdirectory_directory_multipage' => array(
+			'title' => $lang->playerdirectory_setting_directory_multipage,
+			'description' => $lang->playerdirectory_setting_directory_multipage_desc,
+			'optionscode' => 'numeric',
+			'value' => '20', // Default
+			'disporder' => 3
+		),
+		'playerdirectory_directory_teamaccounts' => array(
+			'title' => $lang->playerdirectory_setting_directory_teamaccounts,
+			'description' => $lang->playerdirectory_setting_directory_teamaccounts_desc,
+			'optionscode' => 'text',
+			'value' => '1', // Default
+			'disporder' => 4
+		),
+		'playerdirectory_playerstat' => array(
+			'title' => $lang->playerdirectory_setting_playerstat,
+			'description' => $lang->playerdirectory_setting_playerstat_desc,
+			'optionscode' => 'yesno',
+			'value' => '0', // Default
+			'disporder' => 5
+		),
+		'playerdirectory_playerstat_guest' => array(
+			'title' => $lang->playerdirectory_setting_playerstat_guest,
+			'description' => $lang->playerdirectory_setting_playerstat_guest_desc,
+			'optionscode' => 'yesno',
+			'value' => '0', // Default
+			'disporder' => 6
+		),
+		'playerdirectory_characterstat' => array(
+			'title' => $lang->playerdirectory_setting_characterstat,
+			'description' => $lang->playerdirectory_setting_characterstat_desc,
+			'optionscode' => 'yesno',
+			'value' => '0', // Default
+			'disporder' => 7
+		),
+		'playerdirectory_characterstat_guest' => array(
+			'title' => $lang->playerdirectory_setting_characterstat_guest,
+			'description' => $lang->playerdirectory_setting_characterstat_guest_desc,
+			'optionscode' => 'yesno',
+			'value' => '0', // Default
+			'disporder' => 8
+		),
+		'playerdirectory_profilfeldsystem' => array(
+			'title' => $lang->playerdirectory_setting_profilfeldsystem,
+			'description' => $lang->playerdirectory_setting_profilfeldsystem_desc,
+			'optionscode' => 'select\n0='.$lang->playerdirectory_setting_profilfeldsystem_profilefield.'\n1='.$lang->playerdirectory_setting_profilfeldsystem_applicationfield.'\n2='.$lang->playerdirectory_setting_profilfeldsystem_both,
+			'value' => '0', // Default
+			'disporder' => 9
+		),
+		'playerdirectory_playername' => array(
+			'title' => $lang->playerdirectory_setting_playername,
+			'description' => $lang->playerdirectory_setting_playername_desc,
+			'optionscode' => 'text',
+			'value' => '4', // Default
+			'disporder' => 10
+		),
+		'playerdirectory_avatar_default' => array(
+			'title' => $lang->playerdirectory_setting_avatar_default,
+			'description' => $lang->playerdirectory_setting_avatar_default_desc,
+			'optionscode' => 'text',
+			'value' => 'default_avatar.png', // Default
+			'disporder' => 11
+		),
+		'playerdirectory_avatar_guest' => array(
+			'title' => $lang->playerdirectory_setting_avatar_guest,
+			'description' => $lang->playerdirectory_setting_avatar_guest_desc,
+			'optionscode' => 'yesno',
+			'value' => '0', // Default
+			'disporder' => 12
+		),
+		'playerdirectory_birthday' => array(
+			'title' => $lang->playerdirectory_setting_birthday,
+			'description' => $lang->playerdirectory_setting_birthday_desc,
+			'optionscode' => 'select\n0='.$lang->playerdirectory_setting_birthday_field.'\n1='.$lang->playerdirectory_setting_birthday_mybb.'\n2='.$lang->playerdirectory_setting_birthday_age,
+			'value' => '0', // Default
+			'disporder' => 13
+		),
+		'playerdirectory_birthday_field' => array(
+			'title' => $lang->playerdirectory_setting_birthday_field_id,
+			'description' => $lang->playerdirectory_setting_birthday_field_id_desc,
+			'optionscode' => 'text',
+			'value' => '', // Default
+			'disporder' => 14
+		),
+		'playerdirectory_age_field' => array(
+			'title' => $lang->playerdirectory_setting_birthday_age_field,
+			'description' => $lang->playerdirectory_setting_birthday_age_field_desc,
+			'optionscode' => 'text',
+			'value' => '', // Default
+			'disporder' => 15
+		),
+		'playerdirectory_inplayday' => array(
+			'title' => $lang->playerdirectory_setting_inplayday,
+			'description' => $lang->playerdirectory_setting_inplayday_desc,
+			'optionscode' => 'text',
+			'value' => '31.03.2020', // Default
+			'disporder' => 16
+		),
+		'playerdirectory_inplaytracker' => array(
+			'title' => $lang->playerdirectory_setting_inplaytracker,
+			'description' => $lang->playerdirectory_setting_inplaytracker_desc,
+			'optionscode' => 'select\n0='.$lang->playerdirectory_setting_inplaytracker_jule2.'\n1='.$lang->playerdirectory_setting_inplaytracker_jule3.'\n2='.$lang->playerdirectory_setting_inplaytracker_katja.'\n3='.$lang->playerdirectory_setting_inplaytracker_lara.'\n4='.$lang->playerdirectory_setting_inplaytracker_ales1.'\n5='.$lang->playerdirectory_setting_inplaytracker_ales2,
+			'value' => '1', // Default
+			'disporder' => 17
+		),
+		'playerdirectory_inplaystat' => array(
+			'title' => $lang->playerdirectory_setting_inplaystat,
+			'description' => $lang->playerdirectory_setting_inplaystat_desc,
+			'optionscode' => 'select\n0='.$lang->playerdirectory_setting_inplaystat_none.'\n1='.$lang->playerdirectory_setting_inplaystat_bar.'\n2='.$lang->playerdirectory_setting_inplaystat_word,
+			'value' => '0', // Default
+			'disporder' => 18
+		),
+		'playerdirectory_scenestat' => array(
+			'title' => $lang->playerdirectory_setting_scenestat,
+			'description' => $lang->playerdirectory_setting_scenestat_desc,
+			'optionscode' => 'select\n0='.$lang->playerdirectory_setting_scenestat_none.'\n1='.$lang->playerdirectory_setting_scenestat_bar.'\n2='.$lang->playerdirectory_setting_scenestat_pie.'\n3='.$lang->playerdirectory_setting_scenestat_word,
+			'value' => '0', // Default
+			'disporder' => 19
+		),
+		'playerdirectory_scenestat_legend' => array(
+			'title' => $lang->playerdirectory_setting_scenestat_legend,
+			'description' => $lang->playerdirectory_setting_scenestat_legend_desc,
+			'optionscode' => 'yesno',
+			'value' => '0', // Default
+			'disporder' => 20
+		),
+		'playerdirectory_poststat' => array(
+			'title' => $lang->playerdirectory_setting_poststat,
+			'description' => $lang->playerdirectory_setting_poststat_desc,
+			'optionscode' => 'select\n0='.$lang->playerdirectory_setting_poststat_none.'\n1='.$lang->playerdirectory_setting_poststat_bar.'\n2='.$lang->playerdirectory_setting_poststat_pie.'\n3='.$lang->playerdirectory_setting_poststat_word,
+			'value' => '0', // Default
+			'disporder' => 21
+		),
+		'playerdirectory_poststat_legend' => array(
+			'title' => $lang->playerdirectory_setting_poststat_legend,
+			'description' => $lang->playerdirectory_setting_poststat_legend_desc,
+			'optionscode' => 'yesno',
+			'value' => '0', // Default
+			'disporder' => 22
+		),
+		'playerdirectory_colorstat' => array(
+			'title' => $lang->playerdirectory_setting_colorstat,
+			'description' => $lang->playerdirectory_setting_colorstat_desc,
+			'optionscode' => 'textarea',
+			'value' => '#8baddc, #5e7596, #70aab5, #365358, #90cec1, #5a9286, #afd49b, #6d875f, #cdbca5, #887d6e, #8f99cd, #697198, #6c6c6c, #4b4b4b, #fff2ca, #fae29a, #fccb8d, #f7b284, #946b6e, #50383a', // Default
+			'disporder' => 23
+		),
+		'playerdirectory_inplayquotes' => array(
+			'title' => $lang->playerdirectory_setting_inplayquotes,
+			'description' => $lang->playerdirectory_setting_inplayquotes_desc,
+			'optionscode' => 'yesno',
+			'value' => '0', // Default
+			'disporder' => 24
+		),
+		'playerdirectory_lists' => array(
+			'title' => $lang->playerdirectory_setting_lists,
+			'description' => $lang->playerdirectory_setting_lists_desc,
+			'optionscode' => 'text',
+			'value' => 'lists.php', // Default
+			'disporder' => 25
+		),
+		'playerdirectory_lists_menu' => array(
+			'title' => $lang->playerdirectory_setting_lists_menu,
+			'description' => $lang->playerdirectory_setting_lists_menu_desc,
+			'optionscode' => 'select\n0='.$lang->playerdirectory_setting_lists_menu_none.'\n1='.$lang->playerdirectory_setting_lists_menu_jule.'\n2='.$lang->playerdirectory_setting_lists_menu_own,
+			'value' => '0', // Default
+			'disporder' => 26
+		),
+        'playerdirectory_lists_menu_tpl' => array(
+            'title' => $lang->playerdirectory_setting_lists_menu_tpl,
+            'description' => $lang->playerdirectory_setting_lists_menu_tpl_desc,
+            'optionscode' => 'text',
+            'value' => 'lists_nav', // Default
+            'disporder' => 27
+        ),
+	);
+
+    $gid = $db->fetch_field($db->write_query("SELECT gid FROM ".TABLE_PREFIX."settinggroups WHERE name = 'playerdirectory' LIMIT 1;"), "gid");
+
+    if ($type == 'install') {
+        foreach ($setting_array as $name => $setting) {
+          $setting['name'] = $name;
+          $setting['gid'] = $gid;
+          $db->insert_query('settings', $setting);
+        }  
+    }
+
+    if ($type == 'update') {
+
+        // Einzeln durchgehen 
+        foreach ($setting_array as $name => $setting) {
+            $setting['name'] = $name;
+            $check = $db->write_query("SELECT name FROM ".TABLE_PREFIX."settings WHERE name = '".$name."'"); // Überprüfen, ob sie vorhanden ist
+            $check = $db->num_rows($check);
+            $setting['gid'] = $gid;
+            if ($check == 0) { // nicht vorhanden, hinzufügen
+              $db->insert_query('settings', $setting);
+            } else { // vorhanden, auf Änderungen überprüfen
+                
+                $current_setting = $db->fetch_array($db->write_query("
+                    SELECT title, description, optionscode, disporder 
+                    FROM ".TABLE_PREFIX."settings 
+                    WHERE name = '".$db->escape_string($name)."'
+                "));
+            
+                $update_needed = false;
+                $update_data = array();
+            
+                if ($current_setting['title'] != $setting['title']) {
+                    $update_data['title'] = $setting['title'];
+                    $update_needed = true;
+                }
+                if ($current_setting['description'] != $setting['description']) {
+                    $update_data['description'] = $setting['description'];
+                    $update_needed = true;
+                }
+                if ($current_setting['optionscode'] != $setting['optionscode']) {
+                    $update_data['optionscode'] = $setting['optionscode'];
+                    $update_needed = true;
+                }
+                if ($current_setting['disporder'] != $setting['disporder']) {
+                    $update_data['disporder'] = $setting['disporder'];
+                    $update_needed = true;
+                }
+            
+                if ($update_needed) {
+                    $db->update_query('settings', $update_data, "name = '".$db->escape_string($name)."'");
+                }
+            }  
+        }  
+    }
+
+    rebuild_settings();
+}
+
+// TEMPLATES
+function playerdirectory_templates($mode = '') {
+
+    global $db;
+
+    $templates[] = array(
+        'title'		=> 'playerdirectory_characterstat',
+        'template'	=> $db->escape_string('<html>
+        <head>
+            <title>
+                {$mybb->settings[\'bbname\']} - {$lang->playerdirectory_characterstat}
+            </title>
+            {$headerinclude}
+        </head>
+        <body>
+            {$header}
+            <table width="100%" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td>
+                        {$notice_banner}
+                        <div class="playerdirectory_headline">{$lang->playerdirectory_characterstat}</div>
+                        {$random_inplayquote}
+    
+                        <div class="playerdirectory_characterstat_statistic">
+    
+                            <div class="playerdirectory_characterstat_stat">
+                                <div class="playerdirectory_characterstat_question">{$lang->playerdirectory_statistic_regdate}</div>
+                                <div class="playerdirectory_characterstat_answer">{$regdate}</div>		
+                            </div>
+                            <div class="playerdirectory_characterstat_stat">	
+                                <div class="playerdirectory_characterstat_question">{$lang->playerdirectory_statistic_lastactivity}</div>
+                                <div class="playerdirectory_characterstat_answer">{$lastactivity}</div>	
+                            </div>
+                            <div class="playerdirectory_characterstat_stat">	
+                                <div class="playerdirectory_characterstat_question">{$lang->playerdirectory_statistic_timeonline}</div>
+                                <div  class="playerdirectory_characterstat_answer">{$timeonline}</div>	
+                            </div>
+                            <div class="playerdirectory_characterstat_stat">
+                                <div class="playerdirectory_characterstat_question">{$lang->playerdirectory_statistic_lastinplaypost}</div>
+                                <div class="playerdirectory_characterstat_answer">{$lastinplaypost}</div>		
+                            </div>
+    
+    
+                            <div class="playerdirectory_characterstat_stat">
+                                <div class="playerdirectory_characterstat_question">{$lang->playerdirectory_statistic_allinplayposts}</div>
+                                <div class="playerdirectory_characterstat_answer">{$allinplayposts_formatted}</div>		
+                            </div>
+                            <div class="playerdirectory_characterstat_stat">	
+                                <div class="playerdirectory_characterstat_question">{$lang->playerdirectory_statistic_allinplayscenes}</div>
+                                <div class="playerdirectory_characterstat_answer">{$allinplayscenes_formatted}</div>	
+                            </div>
+                            <div class="playerdirectory_characterstat_stat">	
+                                <div class="playerdirectory_characterstat_question">{$lang->playerdirectory_statistic_hotscene}</div>
+                                <div class="playerdirectory_characterstat_answer">{$hotscene}</div>	
+                            </div>
+                            <div class="playerdirectory_characterstat_stat">	
+                                <div class="playerdirectory_characterstat_question">{$lang->playerdirectory_statistic_viewscene}</div>
+                                <div class="playerdirectory_characterstat_answer">{$viewscene}</div>	
+                            </div>
+    
+    
+                            <div class="playerdirectory_characterstat_stat">
+                                <div class="playerdirectory_characterstat_question">{$lang->playerdirectory_statistic_charactersall}</div>
+                                <div class="playerdirectory_characterstat_answer">{$charactersall_formatted}</div>		
+                            </div>
+                            <div class="playerdirectory_characterstat_stat">	
+                                <div class="playerdirectory_characterstat_question">{$lang->playerdirectory_statistic_averageCharacters}</div>
+                                <div class="playerdirectory_characterstat_answer">{$averageCharacters_formatted}</div>	
+                            </div>
+                            <div class="playerdirectory_characterstat_stat">	
+                                <div class="playerdirectory_characterstat_question">{$lang->playerdirectory_statistic_wordsall}</div>
+                                <div class="playerdirectory_characterstat_answer">{$wordsall_formatted}</div>	
+                            </div>
+                            <div class="playerdirectory_characterstat_stat">	
+                                <div class="playerdirectory_characterstat_question">{$lang->playerdirectory_statistic_averageWords}</div>
+                                <div class="playerdirectory_characterstat_answer">{$averageWords_formatted}</div>	
+                            </div>
+    
+                            {$postactivity_months}
+    
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            {$footer}
+        </body>
+        </html>'),
+        'sid'		=> '-2',
+        'dateline'	=> TIME_NOW
+    );
+
+    $templates[] = array(
+        'title'		=> 'playerdirectory_characterstat_inplayquote',
+        'template'	=> $db->escape_string('<div class="playerdirectory_inplayquote">
+        <div class="playerdirectory_inplayquote_avatar"><img src="{$avatar_url}"></div>
+        <div class="playerdirectory_inplayquote_container">
+            <div class="playerdirectory_quote">
+            {$quote}
+            </div>
+            <div class="playerdirectory_quote_user">
+                <b>{$charactername}</b><br>
+                <span>{$scenelink}</span>
+            </div>
+        </div>
+        </div>'),
+        'sid'		=> '-2',
+        'dateline'	=> TIME_NOW
+    );
+
+    $templates[] = array(
+        'title'		=> 'playerdirectory_directory',
+        'template'	=> $db->escape_string('<html>
+        <head>
+            <title>{$mybb->settings[\'bbname\']} - {$lang->playerdirectory_directory}</title>
+            {$headerinclude}
+        </head>
+        <body>
+            {$header}
+            {$lists_menu}
+            <table border="0" cellspacing="{$theme[\'borderwidth\']}" cellpadding="{$theme[\'tablespace\']}" class="tborder" width="100%">
+                <tr>
+                    <td class="thead" colspan="3"><strong>{$lang->playerdirectory_directory}</strong></td>
+                </tr>
+                <tr>
+                    <td class="tcat" align="center" style="width:33%"><span class="smalltext"><strong>{$count_allPlayers}</strong></span></td>
+                    <td class="tcat" align="center" style="width:33%"><span class="smalltext"><strong>{$count_allCharacters}</strong></span></td>
+                    <td class="tcat" align="center" style="width:33%"><span class="smalltext"><strong>{$count_averagecharacters}</strong></span></td>
+                </tr>
+                <tr>
+                    <td class="trow1" colspan="3">
+                        <div class="playerdirectory_directory">
+                            {$all_players}
+                        </div>
+                        {$multipage}
+                    </td>
+                </tr>
+            </table>
+            {$footer}
+        </body>
+        </html>'),
+        'sid'		=> '-2',
+        'dateline'	=> TIME_NOW
+    );
+
+    $templates[] = array(
+        'title'		=> 'playerdirectory_directory_characters',
+        'template'	=> $db->escape_string('<div class="directory_characters">
+        <div class="directory_characters_avatar">
+            <img src="{$avatar_url}">
+        </div>
+        <div>
+            <div class="directory_characters_fact"><strong>{$charactername}</strong></div>
+            <div class="directory_characters_fact">{$character_inplaystat}</div>
+            {$character_button}
+        </div>
+        </div>'),
+        'sid'		=> '-2',
+        'dateline'	=> TIME_NOW
+    );
+
+    $templates[] = array(
+        'title'		=> 'playerdirectory_directory_user',
+        'template'	=> $db->escape_string('<div class="playerdirectory_user">
+        <div class="playerdirectory_headline">{$playername}</div>
+        <div class="playerdirectory_user_information">
+            <div class="playerdirectory_user_information_item"><b>{$lang->playerdirectory_directory_user_regdate}</b> {$regdate}</div>
+            <div class="playerdirectory_user_information_item"><b>{$lang->playerdirectory_directory_user_lastactivity}</b> {$lastactivity}</div>
+            <div class="playerdirectory_user_information_item">{$player_inplaystat}</div>
+            {$player_button}
+        </div>
+        <div class="playerdirectory_subline">{$charas_count}</div>
+        <div class="playerdirectory_user_accounts">
+            {$characters}
+        </div>
+        </div>'),
+        'sid'		=> '-2',
+        'dateline'	=> TIME_NOW
+    );
+
+    $templates[] = array(
+        'title'		=> 'playerdirectory_menu_link',
+        'template'	=> $db->escape_string('<li><a href="{$mybb->settings[\'bburl\']}/misc.php?action=playerdirectory" class="memberlist">{$lang->playerdirectory_directory}</a></li>'),
+        'sid'		=> '-2',
+        'dateline'	=> TIME_NOW
+    );
+
+    $templates[] = array(
+        'title'		=> 'playerdirectory_notice_banner',
+        'template'	=> $db->escape_string('<div class="pm_alert">{$banner_text}</div>'),
+        'sid'		=> '-2',
+        'dateline'	=> TIME_NOW
+    );
+
+    $templates[] = array(
+        'title'		=> 'playerdirectory_playerstat',
+        'template'	=> $db->escape_string('<html>
+        <head>
+            <title>
+                {$mybb->settings[\'bbname\']} - {$lang->playerdirectory_playerstat}
+            </title>
+            {$headerinclude}
+        </head>
+        <body>
+            {$header}
+            <table width="100%" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td>
+                        {$notice_banner}
+                        <div class="playerdirectory_headline">{$lang->playerdirectory_playerstat}</div>
+                        <div class="playerdirectory_subline">{$lang->playerdirectory_inplaystatistic}</div>
+    
+                        <div class="playerdirectory_playerstat_statistic">
+    
+                            <div class="playerdirectory_playerstat_stat">
+                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_regdate}</div>
+                                <div class="playerdirectory_playerstat_answer">{$regdate}</div>		
+                            </div>
+                            <div class="playerdirectory_playerstat_stat">	
+                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_lastactivity}</div>
+                                <div class="playerdirectory_playerstat_answer">{$lastactivity}</div>	
+                            </div>
+                            <div class="playerdirectory_playerstat_stat">	
+                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_timeonline}</div>
+                                <div  class="playerdirectory_playerstat_answer">{$timeonline}</div>	
+                            </div>
+                            <div class="playerdirectory_playerstat_stat">
+                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_lastinplaypost}</div>
+                                <div class="playerdirectory_playerstat_answer">{$lastinplaypost}</div>		
+                            </div>
+    
+    
+                            <div class="playerdirectory_playerstat_stat">
+                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_allinplayposts}</div>
+                                <div class="playerdirectory_playerstat_answer">{$allinplayposts_formatted}</div>		
+                            </div>
+                            <div class="playerdirectory_playerstat_stat">	
+                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_allinplayscenes}</div>
+                                <div class="playerdirectory_playerstat_answer">{$allinplayscenes_formatted}</div>	
+                            </div>
+                            <div class="playerdirectory_playerstat_stat">	
+                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_hotscene}</div>
+                                <div class="playerdirectory_playerstat_answer">{$hotscene}</div>	
+                            </div>
+                            <div class="playerdirectory_playerstat_stat">	
+                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_viewscene}</div>
+                                <div class="playerdirectory_playerstat_answer">{$viewscene}</div>	
+                            </div>
+    
+    
+                            <div class="playerdirectory_playerstat_stat">
+                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_charactersall}</div>
+                                <div class="playerdirectory_playerstat_answer">{$charactersall_formatted}</div>		
+                            </div>
+                            <div class="playerdirectory_playerstat_stat">	
+                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_averageCharacters}</div>
+                                <div class="playerdirectory_playerstat_answer">{$averageCharacters_formatted}</div>	
+                            </div>
+                            <div class="playerdirectory_playerstat_stat">	
+                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_wordsall}</div>
+                                <div class="playerdirectory_playerstat_answer">{$wordsall_formatted}</div>	
+                            </div>
+                            <div class="playerdirectory_playerstat_stat">	
+                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_averageWords}</div>
+                                <div class="playerdirectory_playerstat_answer">{$averageWords_formatted}</div>	
+                            </div>
+    
+                        </div>
+    
+                        {$postactivity_months}
+    
+                        <div class="playerdirectory_subline">{$lang->playerdirectory_characterstatistic}</div>
+                        
+                        {$random_inplayquote}
+                        
+                        <div class="playerdirectory_playerstat_statistic">
+                            <div class="playerdirectory_playerstat_stat">
+                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_charas}</div>
+                                <div class="playerdirectory_playerstat_answer">{$count_charas}</div>		
+                            </div>
+                            <div class="playerdirectory_playerstat_stat">	
+                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_firstchara}</div>
+                                <div class="playerdirectory_playerstat_answer">{$firstchara}</div>	
+                            </div>
+                            <div class="playerdirectory_playerstat_stat">	
+                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_lastchara}</div>
+                                <div class="playerdirectory_playerstat_answer">{$lastchara}</div>	
+                            </div>
+                            <div class="playerdirectory_playerstat_stat">	
+                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_hotchara}</div>
+                                <div class="playerdirectory_playerstat_answer">{$hotCharacter}</div>	
+                            </div>
+    
+                            <div class="playerdirectory_playerstat_stat">
+                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_minage}</div>
+                                <div class="playerdirectory_playerstat_answer">{$minage}</div>		
+                            </div>
+                            <div class="playerdirectory_playerstat_stat">	
+                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_maxage}</div>
+                                <div class="playerdirectory_playerstat_answer">{$maxage}</div>	
+                            </div>
+                            <div class="playerdirectory_playerstat_stat">	
+                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_averageage}</div>
+                                <div class="playerdirectory_playerstat_answer">{$averageage}</div>	
+                            </div>
+                            <div class="playerdirectory_playerstat_stat">	
+                                <div class="playerdirectory_playerstat_question">{$lang->playerdirectory_statistic_hotcharascene}</div>
+                                <div class="playerdirectory_playerstat_answer">{$hotcharascene}</div>	
+                            </div>
+    
+                        </div>
+                        {$postactivity_perChara}
+                        {$characters_bit}
+                    </td>
+                </tr>
+            </table>
+            {$footer}
+        </body>
+        </html>'),
+        'sid'		=> '-2',
+        'dateline'	=> TIME_NOW
+    );
+
+    $templates[] = array(
+        'title'		=> 'playerdirectory_playerstat_characters',
+        'template'	=> $db->escape_string('<div class="playerdirectory_playerstat_characters">
+        <div class="playerdirectory_playerstat_avatar">
+            <img src="{$avatar_url}">
+        </div>
+        <div class="playerdirectory_playerstat_infos">
+            <div class="playerdirectory_playerstat_username">{$charactername} | {$age_years}
+                <span style="float:right">{$character_button}</span>
+            </div>
+            <div class="playerdirectory_playerstat_usertitle">{$usertitle}</div>
+            <div class="playerdirectory_playerstat_fact"><b>{$lang->playerdirectory_statistic_regdate}</b> {$regdate}</div>
+            <div class="playerdirectory_playerstat_fact"><b>{$lang->playerdirectory_statistic_lastactivity}</b> {$lastactivity}</div>
+            <div class="playerdirectory_playerstat_fact">{$character_inplaystat}</div>
+        </div>
+        </div>'),
+        'sid'		=> '-2',
+        'dateline'	=> TIME_NOW
+    );
+
+    $templates[] = array(
+        'title'		=> 'playerdirectory_playerstat_inplayquote',
+        'template'	=> $db->escape_string('<div class="playerdirectory_inplayquote">
+        <div class="playerdirectory_inplayquote_avatar"><img src="{$avatar_url}"></div>
+        <div class="playerdirectory_inplayquote_container">
+            <div class="playerdirectory_quote">
+            {$quote}
+            </div>
+            <div class="playerdirectory_quote_user">
+                <b>{$charactername}</b><br>
+                <span>{$scenelink}</span>
+            </div>
+        </div>
+        </div>'),
+        'sid'		=> '-2',
+        'dateline'	=> TIME_NOW
+    );
+
+    $templates[] = array(
+        'title'		=> 'playerdirectory_playerstat_ownstat',
+        'template'	=> $db->escape_string('<div class="playerdirectory_playerstat_ownstat_headline">{$statisticname}</div>{$ownstat_bit}'),
+        'sid'		=> '-2',
+        'dateline'	=> TIME_NOW
+    );
+
+    $templates[] = array(
+        'title'		=> 'playerdirectory_playerstat_ownstat_bar',
+        'template'	=> $db->escape_string('<div class="playerdirectory_playerstat_ownstat_headline">{$statisticname}</div>
+        <div class="playerdirectory_playerstat_ownstat_chart">
+            <canvas id="{$chartname}"></canvas>
+        </div>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+        <script>
+            var style = getComputedStyle(document.body);
+            var text = style.getPropertyValue(\'--chart-text\');
+            // data define for bar chart
+            var myData = {
+                labels: {$labels_chart},
+                datasets: [{
+                    backgroundColor: {$backgroundColor},
+                    data: {$data_chart}
+                }]
+            };
+            // Options define for display value on top of bars
+            var myoption = {
+                maintainAspectRatio: false,
+                legend: {
+                    "display": false
+                },
+                responsive: true,
+                tooltips: {
+                    enabled: true
+                },
+                hover: {
+                    animationDuration: 1
+                },
+                animation: {
+                    duration: 1,
+                    onComplete: function () {
+                        var chartInstance = this.chart,
+                            ctx = chartInstance.ctx;
+                        ctx.textAlign = \'center\';
+                        ctx.fillStyle = text;
+                        ctx.textBaseline = \'bottom\';
+                        // Loop through each data in the datasets
+                        this.data.datasets.forEach(function (dataset, i) {
+                            var meta = chartInstance.controller.getDatasetMeta(i);
+                            meta.data.forEach(function (bar, index) {
+                                var data = dataset.data[index];
+                                ctx.fillText(data, bar._model.x, bar._model.y - 5);
+        
+                            });
+                        });
+                    }
+                },
+                scales: {
+                    yAxes: [{
+                        display: true,
+                        gridLines: {
+                            display: false
+                        },
+                        ticks: {
+                            max: {$maxCount},
+                            display: false,
+                            beginAtZero: true,
+                            color: accent
+                        }
+                    }],
+                    xAxes: [{
+                        gridLines: {
+                            display: false
+                        },
+                        ticks: {
+                            beginAtZero: true,
+                            fontColor: text
+                        }
+                    }]
+                }
+            };
+            // Code to draw Chart
+            var ctx = document.getElementById(\'{$chartname}\').getContext(\'2d\');
+            var myChart = new Chart(ctx, {
+                type: \'bar\', // Define chart type
+                data: myData, // Chart data
+                options: myoption // Chart Options [This is optional paramenter use to add some extra things in the chart].
+            });
+        </script>'),
+        'sid'		=> '-2',
+        'dateline'	=> TIME_NOW
+    );
+
+    $templates[] = array(
+        'title'		=> 'playerdirectory_playerstat_ownstat_bit',
+        'template'	=> $db->escape_string('<div class="playerdirectory_playerstat_ownstat_bit_option">
+        <div class="playerdirectory_playerstat_ownstat_bit_optionname">{$fieldname}</div> 
+        {$fieldcount}
+        </div>'),
+        'sid'		=> '-2',
+        'dateline'	=> TIME_NOW
+    );
+
+    $templates[] = array(
+        'title'		=> 'playerdirectory_playerstat_ownstat_pie',
+        'template'	=> $db->escape_string('<div class="playerdirectory_playerstat_ownstat_headline">{$statisticname}</div>
+        <div class="playerdirectory_playerstat_ownstat_chart">
+            <canvas id="{$chartname}"></canvas>
+        </div>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+        <script>
+            var style = getComputedStyle(document.body);
+            var text = style.getPropertyValue(\'--chart-text\');
+            {$propertyValue}
+            // data define for bar chart
+            var myData = {
+                labels: {$labels_chart},
+                datasets: [{
+                    data: {$data_chart},
+                    backgroundColor: {$backgroundColor},
+                    borderWidth: 0
+                }]
+            };
+            // Options define for display value on top of bars
+            var myoption = {
+                maintainAspectRatio: false,
+                legend: {
+                    display: {$legend},
+                    position: \'right\',
+                    labels: {
+                        fontColor: text,
+                        fontSize: 12
+                    },
+                },
+                responsive: true,
+            };
+            // Code to draw Chart
+            var ctx = document.getElementById(\'{$chartname}\').getContext(\'2d\');
+            var myChart = new Chart(ctx, {
+                type: \'pie\', // Define chart type
+                data: myData, // Chart data
+                options: myoption // Chart Options [This is optional paramenter use to add some extra things in the chart].
+            });
+        </script>'),
+        'sid'		=> '-2',
+        'dateline'	=> TIME_NOW
+    );
+
+    $templates[] = array(
+        'title'		=> 'playerdirectory_postactivity_months',
+        'template'	=> $db->escape_string('<div class="playerdirectory_postactivity_months_headline">{$lang->playerdirectory_postactivity_months}</div>
+        <div class="playerdirectory_postactivity_months">
+            <div class="playerdirectory_postactivity_months_poststat">
+                {$months_bit}
+            </div>
+        </div>'),
+        'sid'		=> '-2',
+        'dateline'	=> TIME_NOW
+    );
+    
+    $templates[] = array(
+        'title'		=> 'playerdirectory_postactivity_months_bit',
+        'template'	=> $db->escape_string('<div class="playerdirectory_postactivity_months_month">
+        <div class="playerdirectory_postactivity_months_monthname">{$month_name}</div> 
+        {$allmonthposts_formatted}    
+        </div>'),
+        'sid'		=> '-2',
+        'dateline'	=> TIME_NOW
+    );
+
+    $templates[] = array(
+        'title'		=> 'playerdirectory_postactivity_months_chart',
+        'template'	=> $db->escape_string('<div class="playerdirectory_postactivity_months_headline">{$lang->playerdirectory_postactivity_months}</div>
+        <div class="playerdirectory_postactivity_months_chart">
+            <canvas id="postactivityChart"></canvas>
+        </div>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+        <script>
+            var style = getComputedStyle(document.body);
+            var accent = style.getPropertyValue(\'--chart-primary\');
+            var text = style.getPropertyValue(\'--chart-text\');
+            // data define for bar chart
+            var myData = {
+                labels: {$labels_chart},
+                datasets: [{
+                    backgroundColor: accent,
+                    hoverBackgroundColor: accent,
+                    data: {$data_chart}
+                }]
+            };
+            // Options define for display value on top of bars
+            var myoption = {
+                maintainAspectRatio: false,
+                legend: {
+                    "display": false
+                },
+                tooltips: {
+                    enabled: true,
+                },
+                hover: {
+                    animationDuration: 1
+                },
+                animation: {
+                    duration: 1,
+                    onComplete: function () {
+                        var chartInstance = this.chart,
+                            ctx = chartInstance.ctx;
+                        ctx.textAlign = \'center\';
+                        ctx.fillStyle = text;
+                        ctx.textBaseline = \'bottom\';
+                        // Loop through each data in the datasets
+                        this.data.datasets.forEach(function (dataset, i) {
+                            var meta = chartInstance.controller.getDatasetMeta(i);
+                            meta.data.forEach(function (bar, index) {
+                                var data = dataset.data[index];
+                                ctx.fillText(data, bar._model.x, bar._model.y - 5);
+                            });
+                        });
+                    }
+                },
+                scales: {
+                    yAxes: [{
+                        display: true,
+                        gridLines: {
+                            display: false
+                        },
+                        ticks: {
+                            max: {$maxCount},
+                            display: false,
+                            beginAtZero: true,
+                            color: accent
+                        }
+                    }],
+                    xAxes: [{
+                        gridLines: {
+                            display: false
+                        },
+                        ticks: {
+                            beginAtZero: true,
+                            fontColor: text
+                        }
+                    }]
+                }
+            };
+            // Code to draw Chart
+            var ctx = document.getElementById(\'postactivityChart\').getContext(\'2d\');
+            var myChart = new Chart(ctx, {
+                type: \'bar\', // Define chart type
+                data: myData, // Chart data
+                options: myoption // Chart Options [This is optional paramenter use to add some extra things in the chart].
+            });
+        </script>'),
+        'sid'		=> '-2',
+        'dateline'	=> TIME_NOW
+    );
+
+    $templates[] = array(
+        'title'		=> 'playerdirectory_postactivity_perChara',
+        'template'	=> $db->escape_string('<div class="playerdirectory_postactivity_perChara">
+        {$postactivity_scenestat}
+        {$postactivity_poststat}
+        </div>'),
+        'sid'		=> '-2',
+        'dateline'	=> TIME_NOW
+    );
+
+    $templates[] = array(
+        'title'		=> 'playerdirectory_postactivity_perChara_poststat',
+        'template'	=> $db->escape_string('<div class="playerdirectory_postactivity_perChara_stat">
+        <div class="playerdirectory_postactivity_perChara_headline">{$lang->playerdirectory_postactivity_perChara_poststat}</div>
+        {$poststat_bit}
+        </div>'),
+        'sid'		=> '-2',
+        'dateline'	=> TIME_NOW
+    );
+
+    $templates[] = array(
+        'title'		=> 'playerdirectory_postactivity_perChara_poststat_bit',
+        'template'	=> $db->escape_string('<div class="playerdirectory_postactivity_perChara_bit_chara">
+        <div class="playerdirectory_postactivity_perChara_bit_charactername">{$first_name}<br>{$last_name}</div> 
+        {$postcount_formatted} Posts
+        </div>'),
+        'sid'		=> '-2',
+        'dateline'	=> TIME_NOW
+    );
+
+    $templates[] = array(
+        'title'		=> 'playerdirectory_postactivity_perChara_poststat_chart_bar',
+        'template'	=> $db->escape_string('<div class="playerdirectory_postactivity_perChara_chart">
+        <canvas id="poststatChart"></canvas>
+        </div>
+    
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+        <script>
+        var style = getComputedStyle(document.body);
+        var text = style.getPropertyValue(\'--chart-text\');
+        // data define for bar chart
+        var myData = {
+            labels: {$labels_chart},
+            datasets: [{
+                backgroundColor: {$backgroundColor},
+                data: {$data_chart}
+            }]
+        };
+        // Options define for display value on top of bars
+        var myoption = {
+            maintainAspectRatio: false,
+            legend: {
+                "display": false
+            },
+            responsive: true,
+            tooltips: {
+                enabled: true,
+            },
+            hover: {
+                animationDuration: 1
+            },
+            animation: {
+                duration: 1,
+                onComplete: function () {
+                    var chartInstance = this.chart,
+                        ctx = chartInstance.ctx;
+                    ctx.textAlign = \'center\';
+                    ctx.fillStyle = text;
+                    ctx.textBaseline = \'bottom\';
+                    // Loop through each data in the datasets
+                    this.data.datasets.forEach(function (dataset, i) {
+                        var meta = chartInstance.controller.getDatasetMeta(i);
+                        meta.data.forEach(function (bar, index) {
+                            var data = dataset.data[index];
+                            ctx.fillText(data, bar._model.x, bar._model.y - 5);
+                        });
+                    });
+                }
+            },
+            scales: {
+                yAxes: [{
+                    display: true,
+                    gridLines: {
+                        display: false
+                    },
+                    ticks: {
+                        max: {$maxCount},
+                        display: false,
+                        beginAtZero: true,
+                        color: accent
+                    }
+                }],
+                xAxes: [{
+                    gridLines: {
+                        display: false
+                    },
+                    ticks: {
+                        beginAtZero: true,
+                        fontColor: text
+                    }
+                }]
+            }
+        };
+        // Code to draw Chart
+        var ctx = document.getElementById(\'poststatChart\').getContext(\'2d\');
+        var myChart = new Chart(ctx, {
+            type: \'bar\', // Define chart type
+            data: myData, // Chart data
+            options: myoption // Chart Options [This is optional paramenter use to add some extra things in the chart].
+        });
+        </script>'),
+        'sid'		=> '-2',
+        'dateline'	=> TIME_NOW
+    );
+
+    $templates[] = array(
+        'title'		=> 'playerdirectory_postactivity_perChara_poststat_chart_pie',
+        'template'	=> $db->escape_string('<div class="playerdirectory_postactivity_perChara_chart">
+        <canvas id="poststatChart"></canvas>  
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+        <script>
+        var style = getComputedStyle(document.body);
+        var text = style.getPropertyValue(\'--chart-text\');
+        // data define for bar chart
+        var myData = {
+            labels: {$labels_chart},
+            datasets: [{
+                data: {$data_chart},
+                backgroundColor: {$backgroundColor},
+                borderColor: {$backgroundColor},
+                borderWidth: 0
+            }]
+        };
+        // Options define for display value on top of bars
+        var myoption = {
+            maintainAspectRatio: false,
+            legend: {
+                display: {$legend},
+                position: \'right\',
+                labels: {
+                        fontColor: text,
+                    fontSize: 12
+                    },
+            },
+            tooltips: {
+                enabled: true,
+            },
+            responsive: true,
+        };
+        // Code to draw Chart
+        var ctx = document.getElementById(\'poststatChart\').getContext(\'2d\');
+        var myChart = new Chart(ctx, {
+            type: \'pie\', // Define chart type
+            data: myData, // Chart data
+            options: myoption // Chart Options [This is optional paramenter use to add some extra things in the chart].
+        });
+        </script>'),
+        'sid'		=> '-2',
+        'dateline'	=> TIME_NOW
+    );
+
+    $templates[] = array(
+        'title'		=> 'playerdirectory_postactivity_perChara_scenestat',
+        'template'	=> $db->escape_string('<div class="playerdirectory_postactivity_perChara_stat">
+        <div class="playerdirectory_postactivity_perChara_headline">{$lang->playerdirectory_postactivity_perChara_scenestat}</div>
+        {$scenestat_bit}
+        </div>'),
+        'sid'		=> '-2',
+        'dateline'	=> TIME_NOW
+    );
+
+    $templates[] = array(
+        'title'		=> 'playerdirectory_postactivity_perChara_scenestat_bit',
+        'template'	=> $db->escape_string('<div class="playerdirectory_postactivity_perChara_bit_chara">
+        <div class="playerdirectory_postactivity_perChara_bit_charactername">{$first_name}<br>{$last_name}</div> 
+        {$scenecount_formatted} Szenen
+        </div>'),
+        'sid'		=> '-2',
+        'dateline'	=> TIME_NOW
+    );
+
+    $templates[] = array(
+        'title'		=> 'playerdirectory_postactivity_perChara_scenestat_chart_bar',
+        'template'	=> $db->escape_string('<div class="playerdirectory_postactivity_perChara_chart">
+        <canvas id="scenestatChart"></canvas>
+        </div>
+     
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+        <script>
+        var style = getComputedStyle(document.body);
+        var text = style.getPropertyValue(\'--chart-text\');
+        // data define for bar chart
+        var myData = {
+            labels: {$labels_chart},
+            datasets: [{
+                backgroundColor: {$backgroundColor},
+                data: {$data_chart}
+            }]
+        };
+        // Options define for display value on top of bars
+        var myoption = {
+            maintainAspectRatio: false,
+            legend: {
+                "display": false
+            },
+            responsive: true,
+            tooltips: {
+                enabled: true
+            },
+            hover: {
+                animationDuration: 1
+            },
+            animation: {
+                duration: 1,
+                onComplete: function () {
+                    var chartInstance = this.chart,
+                        ctx = chartInstance.ctx;
+                    ctx.textAlign = \'center\';
+                    ctx.fillStyle = text;
+                    ctx.textBaseline = \'bottom\';
+                    // Loop through each data in the datasets
+                    this.data.datasets.forEach(function (dataset, i) {
+                        var meta = chartInstance.controller.getDatasetMeta(i);
+                        meta.data.forEach(function (bar, index) {
+                            var data = dataset.data[index];
+                            ctx.fillText(data, bar._model.x, bar._model.y - 5);
+                        });
+                    });
+                }
+            },
+            scales: {
+                yAxes: [{
+                    display: true,
+                    gridLines: {
+                        display: false
+                    },
+                    ticks: {
+                        max: {$maxCount},
+                        display: false,
+                        beginAtZero: true,
+                        color: accent
+                    }
+                }],
+                xAxes: [{
+                    gridLines: {
+                        display: false
+                    },
+                    ticks: {
+                        beginAtZero: true,
+                        fontColor: text
+                    }
+                }]
+            }
+        };
+        // Code to draw Chart
+        var ctx = document.getElementById(\'scenestatChart\').getContext(\'2d\');
+        var myChart = new Chart(ctx, {
+            type: \'bar\', // Define chart type
+            data: myData, // Chart data
+            options: myoption // Chart Options [This is optional paramenter use to add some extra things in the chart].
+        });
+        </script>'),
+        'sid'		=> '-2',
+        'dateline'	=> TIME_NOW
+    );
+
+    $templates[] = array(
+        'title'		=> 'playerdirectory_postactivity_perChara_scenestat_chart_pie',
+        'template'	=> $db->escape_string('<div class="playerdirectory_postactivity_perChara_chart">
+        <canvas id="scenestatChart"></canvas>
+        </div>
+    
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+        <script>
+        var style = getComputedStyle(document.body);
+        var text = style.getPropertyValue(\'--chart-text\');
+        // data define for bar chart
+        var myData = {
+            labels: {$labels_chart},
+            datasets: [{
+                data: {$data_chart},
+                backgroundColor: {$backgroundColor},
+                borderColor: {$backgroundColor},
+                borderWidth: 0
+            }]
+        };
+        // Options define for display value on top of bars
+        var myoption = {
+            maintainAspectRatio: false,
+            legend: {
+                display: {$legend},
+                position: \'right\',
+                labels: {
+                        fontColor: text,
+                    fontSize: 12
+                    },
+            },
+            responsive: true,
+        };
+        // Code to draw Chart
+        var ctx = document.getElementById(\'scenestatChart\').getContext(\'2d\');
+        var myChart = new Chart(ctx, {
+            type: \'pie\', // Define chart type
+            data: myData, // Chart data
+            options: myoption // Chart Options [This is optional paramenter use to add some extra things in the chart].
+        });
+        </script>'),
+        'sid'		=> '-2',
+        'dateline'	=> TIME_NOW
+    );
+
+    $templates[] = array(
+        'title'		=> 'playerdirectory_usercp_options',
+        'template'	=> $db->escape_string('<fieldset class="trow2">
+        <legend><strong>{$lang->playerdirectory_usercp_options}</strong></legend>
+        <table cellspacing="0" cellpadding="2">
+            {$option_playerstat}
+            {$option_playerstat_guest}
+            {$option_characterstat}
+            {$option_characterstat_guest}
+        </table>
+        </fieldset><br>'),
+        'sid'		=> '-2',
+        'dateline'	=> TIME_NOW
+    );
+
+    $templates[] = array(
+        'title'		=> 'playerdirectory_usercp_options_bit',
+        'template'	=> $db->escape_string('<tr>
+        <td valign="top" width="1">
+            <input type="checkbox" class="checkbox" name="{$nameID}" id="{$nameID}" value="1" {$checked} />
+        </td>
+        <td>
+            <span class="smalltext">
+                <label for="{$nameID}">{$option_text}</label>
+            </span>
+        </td>
+        </tr>'),
+        'sid'		=> '-2',
+        'dateline'	=> TIME_NOW
+    );
+
+    if ($mode == "update") {
+
+        foreach ($templates as $template) {
+            $query = $db->simple_select("templates", "tid, template", "title = '".$template['title']."' AND sid = '-2'");
+            $existing_template = $db->fetch_array($query);
+
+            if($existing_template) {
+                if ($existing_template['template'] !== $template['template']) {
+                    $db->update_query("templates", array(
+                        'template' => $template['template'],
+                        'dateline' => TIME_NOW
+                    ), "tid = '".$existing_template['tid']."'");
+                }
+            }
+            
+            else {
+                $db->insert_query("templates", $template);
+            }
+        }
+
+    } else {
+        foreach ($templates as $template) {
+            $check = $db->num_rows($db->simple_select("templates", "title", "title = '".$template['title']."'"));
+            if ($check == 0) {
+                $db->insert_query("templates", $template);
+            }
+        }
+    }
+}
+
+// STYLESHEET MASTER
+function playerdirectory_stylesheet() {
+
+    global $db;
+    
+    $css = array(
+        'name' => 'playerdirectory.css',
+        'tid' => 1,
+        'attachedto' => '',
+        "stylesheet" => ':root {	
+            --chart-primary: #0066a2;
+            --chart-text: #000;
+        }
+        
+        /* SPIELERVERZEICHNIS */
+        
+        .playerdirectory_directory {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            gap: 10px;
+            align-items: flex-start;
+        }
+        
+        .playerdirectory_user {
+            width: 32.8%;
+        }
+        
+        .playerdirectory_headline {
+            background: #0066a2 url(../../../images/thead.png) top left repeat-x;
+            color: #ffffff;
+            padding: 8px;
+            font-weight: bold;
+        }
+        
+        .playerdirectory_subline {
+            background: #0f0f0f url(../../../images/tcat.png) repeat-x;
+            color: #fff;
+            border-top: 1px solid #444;
+            border-bottom: 1px solid #000;
+            padding: 6px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .playerdirectory_user_information {
+            padding: 5px 0;
+        }
+        
+        .playerdirectory_user_information_item {
+            padding: 1px 0;
+        }
+        
+        .playerdirectory_user_accounts {
+            height: 200px;
+            overflow: auto;
+            padding-top: 10px;
+        }
+        
+        .directory_characters {
+            display: flex;
+            width: 100%;
+            margin-bottom: 5px;
+            flex-wrap: nowrap;
+            align-items: flex-start;
+            justify-content: flex-start;
+            gap: 10px;
+        }
+        
+        .directory_characters_avatar {
+            width: 15%;
+        }
+        
+        .directory_characters_avatar img {
+            width: 100%;
+        }
+        
+        .directory_characters_fact {
+            padding-top: 3px;
+        }
+        
+        /* SPIELERSTATISTIK */
+        
+        .playerdirectory_playerstat_statistic {
+            display: flex;
+            flex-flow: wrap;
+            margin: 10px 0;
+        }
+        
+        .playerdirectory_playerstat_stat {
+            width: calc(100% / 4);
+            display: flex;
+            flex-flow: column;
+            padding: 10px 5px;
+            box-sizing: border-box;
+            justify-content: flex-start;
+            align-items: center;
+        }
+        
+        .playerdirectory_playerstat_question {
+            color: #333;
+            font-size: small;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .playerdirectory_playerstat_answer {
+            text-align: center;
+        }
+        
+        .playerdirectory_playerstat_characters {
+            display: flex;
+            justify-content: flex-start;
+            flex-wrap: nowrap;
+            gap: 10px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        
+        .playerdirectory_playerstat_avatar {
+            width: 10%;
+        }
+        
+        .playerdirectory_playerstat_avatar img {
+            width: 100%;
+        }
+        
+        .playerdirectory_playerstat_infos {
+            width: 90%;
+        }
+        
+        .playerdirectory_playerstat_username {
+            background: #0066a2 url(../../../images/thead.png) top left repeat-x;
+            color: #ffffff;
+            padding: 8px;
+            font-weight: bold;
+        }
+        
+        .playerdirectory_playerstat_usertitle {
+            background: #0f0f0f url(../../../images/tcat.png) repeat-x;
+            color: #fff;
+            border-top: 1px solid #444;
+            border-bottom: 1px solid #000;
+            padding: 6px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .playerdirectory_playerstat_username a:link,
+        .playerdirectory_playerstat_username a:visited,
+        .playerdirectory_playerstat_username a:active,
+        .playerdirectory_playerstat_username a:hover {
+            color: #ffffff;
+        }
+        
+        /* CHARAKTERSTATISTIK */
+        
+        .playerdirectory_characterstat_statistic {
+            display: flex;
+            flex-flow: wrap;
+            margin: 10px 0;
+        }
+        
+        .playerdirectory_characterstat_stat {
+            width: calc(100% / 4);
+            display: flex;
+            flex-flow: column;
+            padding: 10px 5px;
+            box-sizing: border-box;
+            justify-content: flex-start;
+            align-items: center;
+        }
+        
+        .playerdirectory_characterstat_question {
+            color: #333;
+            font-size: small;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .playerdirectory_characterstat_answer {
+            text-align: center;
+        }
+        
+        .playerdirectory_characterstat_characters {
+            display: flex;
+            justify-content: flex-start;
+            flex-wrap: nowrap;
+            gap: 10px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        
+        .playerdirectory_characterstat_avatar {
+            width: 10%;
+        }
+        
+        .playerdirectory_characterstat_avatar img {
+            width: 100%;
+        }
+        
+        .playerdirectory_characterstat_infos {
+            width: 90%;
+        }
+        
+        .playerdirectory_characterstat_username {
+            background: #0066a2 url(../../../images/thead.png) top left repeat-x;
+            color: #ffffff;
+            padding: 8px;
+            font-weight: bold;
+        }
+        
+        .playerdirectory_characterstat_usertitle {
+            background: #0f0f0f url(../../../images/tcat.png) repeat-x;
+            color: #fff;
+            border-top: 1px solid #444;
+            border-bottom: 1px solid #000;
+            padding: 6px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .playerdirectory_characterstat_username a:link,
+        .playerdirectory_characterstat_username a:visited,
+        .playerdirectory_characterstat_username a:active,
+        .playerdirectory_characterstat_username a:hover {
+            color: #ffffff;
+        }
+        
+        /* INPLAYZITATET */
+        
+        .playerdirectory_inplayquote {
+            width: 100%;
+            display: flex;
+            margin: 10px 0;
+            flex-wrap: nowrap;
+            align-items: center;
+        }
+        
+        .playerdirectory_inplayquote_avatar {
+            width: 10%;
+            text-align: center;
+        }
+        
+        .playerdirectory_inplayquote_avatar img {
+            border-radius: 100%;
+            border: 2px solid #0071bd;
+            width: 100px;
+        }
+        
+        .playerdirectory_inplayquote_container {
+            width: 90%;
+        }
+        
+        .playerdirectory_quote {
+            width: 95%;
+            margin: auto;
+            font-size: 15px;
+            text-align: justify;
+            margin-bottom: 10px;
+        }
+        
+        .playerdirectory_quote_user {
+            text-align: right;
+        }
+        
+        .playerdirectory_quote_user b {
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 13px;
+        }
+        
+        .playerdirectory_quote_user span {
+            font-style: italic;
+            font-size: 11px;
+        }
+        
+        /* 12 MONATE STATISTIK */
+        
+        .playerdirectory_postactivity_months_headline {
+            margin-bottom: 5px;
+            color: #333;
+            font-size: small;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+            width: 100%;
+        }
+        
+        .playerdirectory_postactivity_months {
+            width: 100%;
+            text-align: center;
+            margin: 10px 10px;
+        }
+        
+        .playerdirectory_postactivity_months_poststat {
+            width: 100%;
+            display: flex;
+            flex-flow: wrap;
+            flex-wrap: nowrap;
+            justify-content: space-between;
+        }
+        
+        .playerdirectory_postactivity_months_month {
+            justify-content: center;
+            align-items: center;
+            display: flex;
+            flex-flow: column;
+        }
+        
+        .playerdirectory_postactivity_months_monthname {
+            color: #293340;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .playerdirectory_postactivity_months_chart {
+            height: 250px;
+            width: 100%;
+        }
+        
+        /* PRO CHARAKTER */
+        
+        .playerdirectory_postactivity_perChara {
+            text-align: center;
+            margin: 10px 10px;
+            display: flex;
+            justify-content: space-around;
+            align-content: flex-start;
+            flex-wrap: nowrap;
+        }
+        
+        .playerdirectory_postactivity_perChara_stat {
+            width: 50%;
+            text-align: center;
+        }
+        
+        .playerdirectory_postactivity_perChara_headline {
+            margin-bottom: 5px;
+            color: #333;
+            font-size: small;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+            width: 100%;
+        }
+        
+        .playerdirectory_postactivity_perChara_bit {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            height: 150px;
+            align-items: center;
+        }
+        
+        .playerdirectory_postactivity_perChara_bit_chara {
+            justify-content: center;
+            align-items: center;
+            display: flex;
+            flex-flow: column;
+        }
+        
+        .playerdirectory_postactivity_perChara_bit_charactername {
+            color: #293340;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .playerdirectory_postactivity_perChara_chart {
+            height: 150px;
+            width: 100%;
+        }
+        
+        /* EIGENE STATISTIKEN */
+        
+        .playerdirectory_playerstat_ownstat_headline {
+            margin-bottom: 5px;
+            color: #333;
+            font-size: small;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+            width: 100%;
+        }
+        
+        .playerdirectory_playerstat_ownstat_bit {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .playerdirectory_playerstat_ownstat_bit_option {
+            justify-content: center;
+            align-items: center;
+            display: flex;
+            flex-flow: column;
+        }
+        
+        .playerdirectory_playerstat_ownstat_bit_optionname {
+            color: #293340;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .playerdirectory_playerstat_ownstat_chart {
+            height: 150px;
+            width: 100%;
+        }',
+        'cachefile' => $db->escape_string(str_replace('/', '', 'playerdirectory.css')),
+        'lastmodified' => time()
+    );
+
+    return $css;
+}
+
+// STYLESHEET UPDATE
+function playerdirectory_stylesheet_update() {
+
+    // Update-Stylesheet
+    // wird an bestehende Stylesheets immer ganz am ende hinzugefügt
+    $update = '';
+
+    // Definiere den  Überprüfung-String (muss spezifisch für die Überprüfung sein)
+    $update_string = '';
+
+    return array(
+        'stylesheet' => $update,
+        'update_string' => $update_string
+    );
+}
+
+// UPDATE CHECK
+function playerdirectory_is_updated() {
+
+    global $db;
+
+    $expected_optionscode = "select\n0=Inplaytracker 2.0 von sparks fly\n1=Inplaytracker 3.0 von sparks fly\n2=Szenentracker von risuena\n3=Inplaytracker von little.evil.genius\n4=Inplaytracker 1.0 von Ales\n5=Inplaytracker 2.0 von Ales";
+
+    $query = $db->simple_select("settings", "optionscode", "name = 'playerdirectory_inplaytracker'");
+    $current_optionscode = $db->fetch_field($query, "optionscode");
+
+    if ($current_optionscode == $expected_optionscode) {
+        return true;
+    }
+
+    return false;
 }
