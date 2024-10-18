@@ -1919,7 +1919,9 @@ function playerdirectory_misc(){
 		if($listsmenu != 0){
             // Jules Plugin
             if ($listsmenu == 1) {
+                $lang->load("lists");
                 $query_lists = $db->simple_select("lists", "*");
+                $menu_bit = "";
                 while($list = $db->fetch_array($query_lists)) {
                     eval("\$menu_bit .= \"".$templates->get("lists_menu_bit")."\";");
                 }
@@ -2711,7 +2713,9 @@ function playerdirectory_misc(){
 		if($listsmenu != 2){
             // Jules Plugin
             if ($listsmenu == 1) {
+                $lang->load("lists");
                 $query_lists = $db->simple_select("lists", "*");
+                $menu_bit = "";
                 while($list = $db->fetch_array($query_lists)) {
                     eval("\$menu_bit .= \"".$templates->get("lists_menu_bit")."\";");
                 }
@@ -4442,7 +4446,9 @@ function playerdirectory_misc(){
 		if($listsmenu != 2){
             // Jules Plugin
             if ($listsmenu == 1) {
+                $lang->load("lists");
                 $query_lists = $db->simple_select("lists", "*");
+                $menu_bit = "";
                 while($list = $db->fetch_array($query_lists)) {
                     eval("\$menu_bit .= \"".$templates->get("lists_menu_bit")."\";");
                 }
