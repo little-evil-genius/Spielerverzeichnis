@@ -11,7 +11,7 @@ Genauso kann auch das Listen-Menü angezeigt werden, wenn man das <a href="https
 
 # Vorrausetzung
 - Das ACP Modul <a href="https://github.com/little-evil-genius/rpgstuff_modul" target="_blank">RPG Stuff</a> <b>muss</b> vorhanden sein.
-- Der <a href="https://www.mybb.de/erweiterungen/18x/plugins-verschiedenes/enhanced-account-switcher/" target="_blank">Accountswitcher</a> von doylecc <b>muss</b> installiert sein. <br>
+- Der <a href="https://doylecc.altervista.org/bb/downloads.php?dlid=26&cat=2" target="_blank">Accountswitcher</a> von doylecc <b>muss</b> installiert sein. <br>
 - Für eine Ausgabe von einem zufälligen Inplayzitat wird das <a href="https://github.com/its-sparks-fly/Inplayzitate-2.0"> Inplayzitate 2.0</a> oder <a href="https://github.com/ItsSparksFly/mybb-inplayquotes">Inplayzitate 3.0</a> Plugin von sparks fly oder <a href="https://github.com/Ales12/inplayquotes">Inplayzitate</a> Plugin von Ales oder die <a href="https://github.com/little-evil-genius/inplayzitate">Inplayzitate</a> von mir (little.evil.genius) verwendet. Wenn man diese Option nicht möchte, muss keines der Plugins installiert sein.
 
 # Datenbank-Änderungen
