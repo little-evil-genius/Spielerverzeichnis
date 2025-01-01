@@ -1620,7 +1620,7 @@ function playerdirectory_settings_change(){
 
     $result = $db->simple_select('settinggroups', 'gid', "name='playerdirectory'", array("limit" => 1));
     $group = $db->fetch_array($result);
-    $playerdirectory_settings_peeker = ($mybb->input['gid'] == $group['gid']) && ($mybb->request_method != 'post');
+    $playerdirectory_settings_peeker = ($mybb->get_input('gid') == $group['gid']) && ($mybb->request_method != 'post'); 
 }
 function playerdirectory_settings_peek(&$peekers){
 
