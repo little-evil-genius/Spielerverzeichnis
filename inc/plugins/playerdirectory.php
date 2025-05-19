@@ -1558,6 +1558,8 @@ function playerdirectory_admin_update_plugin(&$table) {
 
             // Ob im Master Style die Überprüfung vorhanden ist
             $masterstylesheet = $db->fetch_field($db->query("SELECT stylesheet FROM ".TABLE_PREFIX."themestylesheets WHERE tid = 1 AND name = 'playerdirectory.css'"), "stylesheet");
+            $masterstylesheet = (string)($masterstylesheet ?? '');
+            $update_string = (string)($update_string ?? '');
             $pos = strpos($masterstylesheet, $update_string);
             if ($pos === false) { // nicht vorhanden 
             
