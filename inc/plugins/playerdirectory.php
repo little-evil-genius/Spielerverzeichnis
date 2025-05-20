@@ -35,7 +35,7 @@ function playerdirectory_info(){
 		"website"	=> "https://github.com/little-evil-genius/Spielerverzeichnis",
 		"author"	=> "little.evil.genius",
 		"authorsite"	=> "https://storming-gates.de/member.php?action=profile&uid=1712",
-		"version"	=> "1.5",
+		"version"	=> "1.5.1",
 		"compatibility" => "18*"
 	);
 
@@ -3583,10 +3583,11 @@ function playerdirectory_misc(){
 		$wordsall = $charactersall = 0;
         while ($post = $db->fetch_array($query_allinplaypost)){
 
-            $searchexp = array("\"", "-", "_", "<", ">", "/", "–", "[", "]");
-            $wordsall += count(explode(' ', preg_replace('/\s+/', ' ', str_ireplace($searchexp, '', trim($post['message']))))); 
-
-            $charactersall += strlen($post['message']);
+            $clean = playerdirectory_count_words_characters($post['message']);
+            // Wörter
+            $wordsall += $clean['words'];
+            // Zeichen
+            $charactersall += $clean['characters'];
         }
 
 		// Geschriebene Zeichen
@@ -4002,7 +4003,7 @@ function playerdirectory_misc(){
 		// In Array bringen
 		$arrayAges = explode(",", $allalter_string);
 
-		$averageage = merdian($arrayAges);
+		$averageage = playerdirectory_merdian($arrayAges);
 
 		if(!empty($averageage)) {
 			$averageage = $lang->sprintf($lang->playerdirectory_statistic_age, $averageage);
@@ -5036,10 +5037,11 @@ function playerdirectory_misc(){
 		$wordsall = $charactersall = 0;
         while ($post = $db->fetch_array($query_allinplaypost)){
 
-            $searchexp = array("\"", "-", "_", "<", ">", "/", "–", "[", "]");
-            $wordsall += count(explode(' ', preg_replace('/\s+/', ' ', str_ireplace($searchexp, '', trim($post['message']))))); 
-
-            $charactersall += strlen($post['message']);
+            $clean = playerdirectory_count_words_characters($post['message']);
+            // Wörter
+            $wordsall += $clean['words'];
+            // Zeichen
+            $charactersall += $clean['characters'];
         }
 
 		// Geschriebene Zeichen
@@ -5463,7 +5465,7 @@ function playerdirectory_usercp_do_options() {
 } 
 
 // HILFSFUNKTION MERDIAN - DURCHSCHNITTLICHES ALTER
-function merdian($array = array()) {
+function playerdirectory_merdian($array = array()) {
     $count = count($array);
 
     if ($count <= 0) {
@@ -5763,6 +5765,47 @@ function playerdirectory_build_statistics($userids_string){
         $array[$arraylabel] = $statistic_typ;  
     }
     return $array;  
+}
+
+// MESSAGE BEREINIGEN
+function playerdirectory_clean_message($message) {
+
+    // Entferne alles innerhalb von <style>...</style>
+    $message = preg_replace('#<style.*?>.*?</style>#is', '', $message);
+
+    // Entferne alle übrigen HTML-Tags
+    $message = strip_tags($message);
+
+    // Dekodiere HTML-Entities (&nbsp; &amp; etc.)
+    $message = html_entity_decode($message, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+    // Entferne alle MyBBCodes/BBCodes
+    $message = preg_replace('~\[[^\]]+\]~', '', $message);
+
+    // Whitespace normalisieren (z. B. mehrere Leerzeichen in eins)
+    $message = preg_replace('/\s+/', ' ', $message);
+    $message = trim($message);
+
+    return $message;
+}
+
+// ZEICHEN UND WORTANZAHL ZÄHLEN
+function playerdirectory_count_words_characters($message) {
+
+    global $mybb;
+
+    $messageClean = playerdirectory_clean_message($message);
+
+    // Wortanzahl
+    $word_count = count(preg_split('/[^\p{L}\p{N}äöüÄÖÜß]+/u', $messageClean, -1, PREG_SPLIT_NO_EMPTY));
+
+    // Zeichenanzahl
+    $character_count = mb_strlen(str_replace([' ', "\n", "\r", "\t"], '', $messageClean));
+
+    return [
+        'words' => $word_count,
+        'characters' => $character_count
+    ];
 }
 
 // DATENBANKTABELLEN
