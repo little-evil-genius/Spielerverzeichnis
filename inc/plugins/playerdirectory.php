@@ -35,7 +35,7 @@ function playerdirectory_info(){
 		"website"	=> "https://github.com/little-evil-genius/Spielerverzeichnis",
 		"author"	=> "little.evil.genius",
 		"authorsite"	=> "https://storming-gates.de/member.php?action=profile&uid=1712",
-		"version"	=> "1.5.1",
+		"version"	=> "1.5.2",
 		"compatibility" => "18*"
 	);
 
@@ -1595,6 +1595,34 @@ function playerdirectory_admin_update_plugin(&$table) {
 
         // Datenbanktabellen & Felder
         playerdirectory_database();
+
+        // Collation prüfen und korrigieren
+        $charset = 'utf8mb4';
+        $collation = 'utf8mb4_unicode_ci';
+
+        $collation_string = $db->build_create_table_collation();
+        if (preg_match('/CHARACTER SET ([^\s]+)\s+COLLATE ([^\s]+)/i', $collation_string, $matches)) {
+            $charset = $matches[1];
+            $collation = $matches[2];
+        }
+
+        $databaseTables = [
+            "playerdirectory_statistics"
+        ];
+
+        foreach ($databaseTables as $databaseTable) {
+            if ($db->table_exists($databaseTable)) {
+                $table = TABLE_PREFIX.$databaseTable;
+
+                $query = $db->query("SHOW TABLE STATUS LIKE '".$db->escape_string($table)."'");
+                $table_status = $db->fetch_array($query);
+                $actual_collation = strtolower($table_status['Collation'] ?? '');
+
+                if (!empty($collation) && $actual_collation !== strtolower($collation)) {
+                    $db->query("ALTER TABLE {$table} CONVERT TO CHARACTER SET {$charset} COLLATE {$collation}");
+                }
+            }
+        }
 
         flash_message($lang->plugins_flash, "success");
         admin_redirect("index.php?module=rpgstuff-plugin_updates");
@@ -5831,7 +5859,7 @@ function playerdirectory_database() {
             PRIMARY KEY(`psid`),
             KEY `psid` (`psid`)
             )
-            ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci AUTO_INCREMENT=1 "
+            ENGINE=InnoDB ".$db->build_create_table_collation().";"
         );
     }
 
@@ -7540,14 +7568,38 @@ function playerdirectory_is_updated() {
 
     global $db;
 
-    $expected_optionscode = "select\n0=Inplaytracker 2.0 von sparks fly\n1=Inplaytracker 3.0 von sparks fly\n2=Szenentracker von risuena\n3=Inplaytracker von little.evil.genius\n4=Inplaytracker 1.0 von Ales\n5=Inplaytracker 2.0 von Ales";
+    $charset = 'utf8mb4';
+    $collation = 'utf8mb4_unicode_ci';
 
-    $query = $db->simple_select("settings", "optionscode", "name = 'playerdirectory_inplaytracker'");
-    $current_optionscode = $db->fetch_field($query, "optionscode");
-
-    if ($current_optionscode == $expected_optionscode) {
-        return true;
+    $collation_string = $db->build_create_table_collation();
+    if (preg_match('/CHARACTER SET ([^\s]+)\s+COLLATE ([^\s]+)/i', $collation_string, $matches)) {
+        $charset = strtolower($matches[1]);
+        $collation = strtolower($matches[2]);
     }
 
-    return false;
+    $databaseTables = [
+        "playerdirectory_statistics"
+    ];
+
+    foreach ($databaseTables as $table_name) {
+        if (!$db->table_exists($table_name)) {
+            return false;
+        }
+
+        $full_table_name = TABLE_PREFIX . $table_name;
+
+        $query = $db->query("
+            SELECT TABLE_COLLATION 
+            FROM information_schema.TABLES 
+            WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '".$db->escape_string($full_table_name)."'
+        ");
+        $result = $db->fetch_array($query);
+        $actual_collation = strtolower($result['TABLE_COLLATION'] ?? '');
+
+        if ($actual_collation !== $collation) {
+            return false;
+        }
+    }
+
+    return true;
 }
