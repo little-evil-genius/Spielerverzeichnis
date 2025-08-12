@@ -2692,7 +2692,7 @@ function playerdirectory_misc(){
             $player_inplaystat = $lang->sprintf($lang->playerdirectory_directory_user_inplaystat, $allinplayposts_formatted, $allinplayscenes_formatted);
 
             if ($playerstat_activated == 1) {
-                if ($mybb->user['uid'] == 0 AND $$playerstat_activated_guest != 1) {
+                if ($mybb->user['uid'] == 0 AND $playerstat_activated_guest != 1) {
                     $player_button = "";
                 } else {
                     $player_button = $lang->sprintf($lang->playerdirectory_directory_user_statbutton, $characterID);
