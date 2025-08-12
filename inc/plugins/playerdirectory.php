@@ -35,7 +35,7 @@ function playerdirectory_info(){
 		"website"	=> "https://github.com/little-evil-genius/Spielerverzeichnis",
 		"author"	=> "little.evil.genius",
 		"authorsite"	=> "https://storming-gates.de/member.php?action=profile&uid=1712",
-		"version"	=> "1.5.2",
+		"version"	=> "1.5.3",
 		"compatibility" => "18*"
 	);
 
